@@ -20,7 +20,7 @@ local Window = Rayfield:CreateWindow({
    Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
    LoadingTitle = "Rayfield Interface Suite",
    LoadingSubtitle = "by Zyrnox and Paranoia",
-   Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
+   Theme = "Dark", -- Check https://docs.sirius.menu/rayfield/configuration/themes
 
    ToggleUIKeybind = "K", -- The keybind to toggle the UI visibility (string like "K" or Enum.KeyCode)
 
@@ -35,11 +35,11 @@ local Window = Rayfield:CreateWindow({
 
    Discord = {
       Enabled = true, -- Prompt the user to join your Discord server if their executor supports it
-      Invite = "nvvVbgTjcf", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
+      Invite = "", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ ABCD would be ABCD
       RememberJoins = false -- Set this to false to make them join the discord every time they load it up
    },
 
-   KeySystem = false, -- Set this to true to use our key system
+   KeySystem = true, -- Set this to true to use our key system
    KeySettings = {
       Title = "Silly",
       Subtitle = "Silly Key System",
@@ -47,7 +47,7 @@ local Window = Rayfield:CreateWindow({
       FileName = "SillyKey", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
       SaveKey = false, -- The user's key will be saved, but if you change the key, they will be unable to use your script
       GrabKeyFromSite = true, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = {"https://raw.githubusercontent.com/zyrn0x/SillyKey/refs/heads/main/Key"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+      Key = {"isightishot"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
    }
 })
 
@@ -7002,8 +7002,9 @@ end)
 
 main:load()
 
---[[ Celestia Parry Logic Below ]]--
+--[[ iSightWare Blatant Features ]]--
 
+-- Blatant Section (auto-extracted)
 local ContextActionService = game:GetService('ContextActionService')
 local Phantom = false
 
