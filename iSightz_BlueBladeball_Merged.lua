@@ -2487,4 +2487,4 @@ else
         backgroundMusic:Stop()
         backgroundMusic:Destroy()
     end
-end)
+end
