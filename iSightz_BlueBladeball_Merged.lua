@@ -1452,7 +1452,7 @@ function Library:create_ui()
             
                 local TitleLabel = Instance.new("TextLabel")
                 TitleLabel.Name = "TitleLabel"
-                TitleLabel.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal)
+                TitleLabel.FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json', Enum.FontWeight.SemiBold, Enum.FontStyle.Normal)
                 TitleLabel.TextSize = 11
                 TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
                 TitleLabel.TextTransparency = 0.2
@@ -1880,8 +1880,8 @@ function Library:create_ui()
                         Config:save(game.GameId, Library._config)
                     end)
             
-                    OptionButton.MouseEnter:Connect(function() TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundTransparency = 0.8, BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play() end)
-                    OptionButton.MouseLeave:Connect(function() TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundTransparency = 1}):Play() end)
+                    OptionButton.MouseEnter:Connect(function() TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play() end)
+                    OptionButton.MouseLeave:Connect(function() TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(30, 30, 30)}):Play() end)
                 end
             
                 if Library:flag_type(settings.flag, 'string') then
@@ -2423,7 +2423,7 @@ RunService.RenderStepped:Connect(function()
                     if distance < shortestDistance and distance <= getgenv().SilentAimDistance then
                         local vectorToTarget = (targetPart.Position - Workspace.CurrentCamera.CFrame.Position).Unit
                         local dotProduct = Workspace.CurrentCamera.CFrame.lookVector:Dot(vectorToTarget)
-                        local angle = math.acos(math.clamp(dotProduct, -1, 1)) -- Clamp dot product
+                        local angle = math.acos(math.clamp(dotProduct, -1, 1))
                         if math.deg(angle) <= getgenv().SilentAimFOV / 2 then
                             if getgenv().SilentAimVisibleOnly then
                                 local rayParams = RaycastParams.new()
@@ -2487,5 +2487,4 @@ else
         backgroundMusic:Stop()
         backgroundMusic:Destroy()
     end
-end
-
+end)
