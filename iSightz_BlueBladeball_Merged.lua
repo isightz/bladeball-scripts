@@ -97,22 +97,22 @@ function Auto_Parry.Get_Ball()
         if ball:IsA("Part") and ball.Name == "Ball" then
             return ball
         end
-    end
+    end)
     return nil
-end
+end)
 
 function Auto_Parry.Is_Curved()
     local Ball = Auto_Parry.Get_Ball()
-    if not Ball then return false end
+    if not Ball then return false end)
 
     table.insert(Previous_Positions, {Position = Ball.Position, Time = tick()})
     for i = #Previous_Positions, 1, -1 do
         if tick() - Previous_Positions[i].Time > 0.1 then
             table.remove(Previous_Positions, i)
-        end
-    end
+        end)
+    end)
 
-    if #Previous_Positions < 3 then return false end
+    if #Previous_Positions < 3 then return false end)
 
     local p1 = Previous_Positions[#Previous_Positions].Position
     local p2 = Previous_Positions[#Previous_Positions - 1].Position
@@ -122,13 +122,13 @@ function Auto_Parry.Is_Curved()
     local v2 = (p2 - p3).Unit
 
     return v1:Dot(v2) < 0.95
-end
+end)
 
 function Auto_Parry.Parry(parryType)
-    if tick() - Last_Parry < 0.02 then return end
+    if tick() - Last_Parry < 0.02 then return end)
 
     local char = Player.Character
-    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end)
 
     if parryType == 'F_Key' then
         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.F, false, game)
@@ -142,25 +142,25 @@ function Auto_Parry.Parry(parryType)
         -- Placeholder for game-specific remote event calls.
         -- ReplicatedStorage.Remotes.ParryEvent:FireServer()
         Library.SendNotification({title = "Auto-Parry Warning", text = "Remote parry type selected, but no remote implemented.", duration = 3})
-    end
+    end)
     Last_Parry = tick()
-end
+end)
 
 RunService.RenderStepped:Connect(function()
-    if not getgenv().AutoParry then return end
+    if not getgenv().AutoParry then return end)
 
     local Ball = Auto_Parry.Get_Ball()
     if not Ball or not Ball:FindFirstChild('zoomies') then
         CurrentBall = nil
         return
-    end
+    end)
     CurrentBall = Ball
 
     local Primary_Part = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
-    if not Primary_Part then return end
+    if not Primary_Part then return end)
 
     local Zoomies = Ball:FindFirstChild('zoomies')
-    if not Zoomies then return end
+    if not Zoomies then return end)
 
     local Speed = Zoomies.VectorVelocity.Magnitude
     local Distance = (Primary_Part.Position - Ball.Position).Magnitude
@@ -178,25 +178,25 @@ RunService.RenderStepped:Connect(function()
 
     if Enough_Speed and Reach_Time > Pings / 10 then
         Ball_Distance_Threshold = math.max(Ball_Distance_Threshold - 15, 15)
-    end
+    end)
 
     local Curve_Detected = Auto_Parry.Is_Curved()
     local canParry = false
     if Distance <= Ball_Distance_Threshold and Dot > -0.25 then
         if Curve_Detected or not getgenv().InfinityDetection then
             canParry = true
-        end
-    end
+        end)
+    end)
 
     if getgenv().RandomParryAccuracyEnabled and canParry then
         if math.random() > 0.8 then
             canParry = false
-        end
-    end
+        end)
+    end)
 
     if canParry then
         Auto_Parry.Parry(getgenv().ParryKey)
-    end
+    end)
 end)
 
 -- Old Remote Event Handlers
@@ -204,9 +204,9 @@ ReplicatedStorage.Remotes.PassAll.OnClientEvent:Connect(function(a, b)
     local Primary_Part = Player.Character and Player.Character.PrimaryPart
     local Ball = Auto_Parry.Get_Ball()
 
-    if not Ball then return end
+    if not Ball then return end)
     local Zoomies = Ball:FindFirstChild('zoomies')
-    if not Zoomies then return end
+    if not Zoomies then return end)
 
     local Speed = Zoomies.VectorVelocity.Magnitude
     local Distance = (Player.Character.PrimaryPart.Position - Ball.Position).Magnitude
@@ -220,16 +220,16 @@ ReplicatedStorage.Remotes.PassAll.OnClientEvent:Connect(function(a, b)
 
     if Enough_Speed and Reach_Time > Pings / 10 then
         Ball_Distance_Threshold = math.max(Ball_Distance_Threshold - 15, 15)
-    end
+    end)
     if b ~= Primary_Part and Distance > Ball_Distance_Threshold then
         Tornado_Time = tick()
-    end
+    end)
 end)
 
 ReplicatedStorage.Remotes.Phantom.OnClientEvent:Connect(function(a, b)
     if getgenv().PhantomV2Detection then
         Library.SendNotification({title = "Phantom Detected!", text = "Phantom V2 detected, attempting countermeasures.", duration = 2})
-    end
+    end)
 end)
 
 ReplicatedStorage.Remotes.ParrySuccess.OnClientEvent:Connect(function()
@@ -239,39 +239,39 @@ end)
 workspace.Balls.ChildAdded:Connect(function(newBall)
     if newBall:IsA("Part") and newBall.Name == "Ball" then
         CurrentBall = newBall
-    end
+    end)
 end)
 
 -- Connection management
 local Connections = setmetatable({
     disconnect = function(self, connection)
-        if not self[connection] then return end
+        if not self[connection] then return end)
         self[connection]:Disconnect()
         self[connection] = nil
-    end,
+    end),
     disconnect_all = function(self)
         for key, value in pairs(self) do
             if typeof(value) == 'RBXScriptConnection' and value.Connected then
                 value:Disconnect()
-            end
+            end)
             self[key] = nil
-        end
-    end
+        end)
+    end)
 }, {__index = {}})
 
 -- General utility functions
 local Util = setmetatable({
     map = function(self, value, in_minimum, in_maximum, out_minimum, out_maximum)
         return (value - in_minimum) * (out_maximum - out_minimum) / (in_maximum - in_minimum) + out_minimum
-    end,
+    end),
     viewport_point_to_world = function(self, location, distance)
         local unit_ray = Workspace.CurrentCamera:ScreenPointToRay(location.X, location.Y)
         return unit_ray.Origin + unit_ray.Direction * distance
-    end,
+    end),
     get_offset = function(self)
         local viewport_size_Y = Workspace.CurrentCamera.ViewportSize.Y
         return self:map(viewport_size_Y, 0, 2560, 8, 56)
-    end
+    end)
 }, {__index = {}})
 
 -- Acrylic Blur Effect
@@ -282,16 +282,16 @@ function AcrylicBlur.new(object)
     local self = setmetatable({ _object = object, _folder = nil, _frame = nil, _root = nil }, AcrylicBlur)
     self:setup()
     return self
-end
+end)
 
 function AcrylicBlur:create_folder()
     local old_folder = Workspace.CurrentCamera:FindFirstChild('AcrylicBlur')
-    if old_folder then Debris:AddItem(old_folder, 0) end
+    if old_folder then Debris:AddItem(old_folder, 0) end)
     local folder = Instance.new('Folder')
     folder.Name = 'AcrylicBlur'
     folder.Parent = Workspace.CurrentCamera
     self._folder = folder
-end
+end)
 
 function AcrylicBlur:create_depth_of_fields()
     local depth_of_fields = Lighting:FindFirstChild('AcrylicBlur') or Instance.new('DepthOfFieldEffect')
@@ -302,14 +302,14 @@ function AcrylicBlur:create_depth_of_fields()
     depth_of_fields.Name = 'AcrylicBlur'
     depth_of_fields.Parent = Lighting
     for _, object in Lighting:GetChildren() do
-        if not object:IsA('DepthOfFieldEffect') then continue end
-        if object == depth_of_fields then continue end
+        if not object:IsA('DepthOfFieldEffect') then continue end)
+        if object == depth_of_fields then continue end)
         Connections[object] = object:GetPropertyChangedSignal('FarIntensity'):Connect(function()
             object.FarIntensity = 0
-        end)
+        end))
         object.FarIntensity = 0
-    end
-end
+    end)
+end)
 
 function AcrylicBlur:create_frame()
     local frame = Instance.new('Frame')
@@ -319,7 +319,7 @@ function AcrylicBlur:create_frame()
     frame.BackgroundTransparency = 1
     frame.Parent = self._object
     self._frame = frame
-end
+end)
 
 function AcrylicBlur:create_root()
     local part = Instance.new('Part')
@@ -340,7 +340,7 @@ function AcrylicBlur:create_root()
     specialMesh.Offset = Vector3.new(0, 0, -0.000001)
     specialMesh.Parent = part
     self._root = part
-end
+end)
 
 function AcrylicBlur:setup()
     self:create_depth_of_fields()
@@ -349,7 +349,7 @@ function AcrylicBlur:setup()
     self:create_frame()
     self:render(0.001)
     self:check_quality_level()
-end
+end)
 
 function AcrylicBlur:render(distance)
     local positions = { top_left = Vector2.new(), top_right = Vector2.new(), bottom_right = Vector2.new() }
@@ -358,7 +358,7 @@ function AcrylicBlur:render(distance)
         positions.top_left = position
         positions.top_right = position + Vector2.new(size.X, 0)
         positions.bottom_right = position + size
-    end
+    end)
 
     local function update()
         local top_left = positions.top_left
@@ -372,10 +372,10 @@ function AcrylicBlur:render(distance)
         local width = (top_right3D - top_left3D).Magnitude
         local height = (top_right3D - bottom_right3D).Magnitude
 
-        if not self._root then return end
+        if not self._root then return end)
         self._root.CFrame = CFrame.fromMatrix((top_left3D + bottom_right3D) / 2, Workspace.CurrentCamera.CFrame.XVector, Workspace.CurrentCamera.CFrame.YVector, Workspace.CurrentCamera.CFrame.ZVector)
         self._root.Mesh.Scale = Vector3.new(width, height, 0)
-    end
+    end)
 
     local function on_change()
         local offset = Util:get_offset()
@@ -383,7 +383,7 @@ function AcrylicBlur:render(distance)
         local position = self._frame.AbsolutePosition + Vector2.new(offset / 2, offset / 2)
         update_positions(size, position)
         task.spawn(update)
-    end
+    end)
 
     Connections['cframe_update'] = Workspace.CurrentCamera:GetPropertyChangedSignal('CFrame'):Connect(update)
     Connections['viewport_size_update'] = Workspace.CurrentCamera:GetPropertyChangedSignal('ViewportSize'):Connect(on_change)
@@ -391,51 +391,51 @@ function AcrylicBlur:render(distance)
     Connections['frame_absolute_position'] = self._frame:GetPropertyChangedSignal('AbsolutePosition'):Connect(on_change)
     Connections['frame_absolute_size'] = self._frame:GetPropertyChangedSignal('AbsoluteSize'):Connect(on_change)
     task.spawn(on_change)
-end
+end)
 
 function AcrylicBlur:check_quality_level()
     local game_settings = UserSettings().GameSettings
     local quality_level = game_settings.SavedQualityLevel.Value
 
-    if quality_level < 8 then self:change_visiblity(false) end
+    if quality_level < 8 then self:change_visiblity(false) end)
     Connections['quality_level'] = game_settings:GetPropertyChangedSignal('SavedQualityLevel'):Connect(function()
         local quality_level = UserSettings().GameSettings.SavedQualityLevel.Value
         self:change_visiblity(quality_level >= 8)
-    end)
-end
+    end))
+end)
 
 function AcrylicBlur:change_visiblity(state)
     self._root.Transparency = state and 0.98 or 1
-end
+end)
 
 -- Configuration saving/loading
 local Config = setmetatable({
     save = function(self, file_name, config)
         pcall(function()
             local flags = HttpService:JSONEncode(config)
-            if not isfolder("Silly") then makefolder("Silly") end
+            if not isfolder("Silly") then makefolder("Silly") end)
             writefile('Silly/'..file_name..'.json', flags)
-        end)
-    end,
+        end))
+    end),
     load = function(self, file_name, config)
         local success_load, result = pcall(function()
-            if not isfolder("Silly") then makefolder("Silly") end
+            if not isfolder("Silly") then makefolder("Silly") end)
             if not isfile('Silly/'..file_name..'.json') then
                 self:save(file_name, config)
                 return
-            end
+            end)
             local flags = readfile('Silly/'..file_name..'.json')
             if not flags then
                 self:save(file_name, config)
                 return
-            end
+            end)
             return HttpService:JSONDecode(flags)
-        end)
+        end))
         if not success_load or not result then
             result = { _flags = {}, _keybinds = {}, _library = {} }
-        end
+        end)
         return result
-    end
+    end)
 }, {__index = {}})
 
 -- Main UI Library
@@ -460,10 +460,10 @@ function Library.new()
     Connections['ui_toggle_keybind'] = UserInputService.InputBegan:Connect(function(input, gameProcessed)
         if input.KeyCode == Enum.KeyCode.RightAlt and not gameProcessed then
             self:UIVisiblity()
-        end
-    end)
+        end)
+    end))
     return self
-end
+end)
 
 -- Notification System
 local NotificationContainer = Instance.new("Frame")
@@ -540,7 +540,7 @@ function Library.SendNotification(settings)
         task.wait(0.1)
         local totalHeight = Title.TextBounds.Y + Body.TextBounds.Y + 10
         InnerFrame.Size = UDim2.new(1, 0, 0, totalHeight)
-    end)
+    end))
 
     task.spawn(function()
         local tweenIn = TweenService:Create(InnerFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
@@ -558,13 +558,13 @@ function Library.SendNotification(settings)
 
         tweenOut.Completed:Connect(function()
             Notification:Destroy()
-        end)
-    end)
-end
+        end))
+    end))
+end)
 
 function Library:get_screen_scale()
     self._ui_scale = Workspace.CurrentCamera.ViewportSize.X / 1400
-end
+end)
 
 function Library:get_device()
     local device = 'Unknown'
@@ -574,23 +574,23 @@ function Library:get_device()
         device = 'Mobile'
     elseif UserInputService.GamepadEnabled then
         device = 'Console'
-    end
+    end)
     self._device = device
-end
+end)
 
 function Library:removed(action)
     self._ui.AncestryChanged:Once(action)
-end
+end)
 
 function Library:flag_type(flag, flag_type)
     return typeof(Library._config._flags[flag]) == flag_type
-end
+end)
 
 function Library:create_ui()
     local existingScreenGui = CoreGui:FindFirstChild('iSightzWareScript')
-    if existingScreenGui then existingScreenGui:Destroy() end
+    if existingScreenGui then existingScreenGui:Destroy() end)
     local oldSilly = CoreGui:FindFirstChild('Silly')
-    if oldSilly then oldSilly:Destroy() end
+    if oldSilly then oldSilly:Destroy() end)
 
     local Silly = Instance.new('ScreenGui')
     Silly.ResetOnSpawn = false
@@ -746,23 +746,23 @@ function Library:create_ui()
                 if inputEnded.UserInputType == Enum.UserInputType.MouseButton1 or inputEnded.UserInputType == Enum.UserInputType.Touch then
                     self._dragging = false
                     Connections:disconnect('container_input_ended_drag')
-                end
-            end)
-        end
-    end
+                end)
+            end))
+        end)
+    end)
 
     local function update_drag(input)
         local delta = input.Position - self._drag_start
         local position = UDim2.new(self._container_position.X.Scale, self._container_position.X.Offset + delta.X, self._container_position.Y.Scale, self._container_position.Y.Offset + delta.Y)
         TweenService:Create(Container, TweenInfo.new(0.2), {Position = position}):Play()
-    end
+    end)
 
     local function drag(input, process)
-        if not self._dragging then return end
+        if not self._dragging then return end)
         if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
             update_drag(input)
-        end
-    end
+        end)
+    end)
 
     Connections['container_input_began_drag'] = Container.InputBegan:Connect(on_drag)
     Connections['input_changed_drag'] = UserInputService.InputChanged:Connect(drag)
@@ -770,7 +770,7 @@ function Library:create_ui()
     self:removed(function()
         self._ui = nil
         Connections:disconnect_all()
-    end)
+    end))
 
     function self:Update1Run(a)
         if a == "nil" then
@@ -778,14 +778,14 @@ function Library:create_ui()
         else
             pcall(function()
                 Container.BackgroundTransparency = tonumber(a)
-            end)
-        end
-    end
+            end))
+        end)
+    end)
 
     function self:UIVisiblity()
         Silly.Enabled = not Silly.Enabled
         self:change_visiblity(Silly.Enabled)
-    end
+    end)
 
     function self:change_visiblity(state)
         if state then
@@ -796,16 +796,16 @@ function Library:create_ui()
             TweenService:Create(Container, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                 Size = UDim2.fromOffset(104.5, 52)
             }):Play()
-        end
-    end
+        end)
+    end)
     
     function self:load()
         local content = {}
         for _, object in Silly:GetDescendants() do
             if object:IsA('ImageLabel') then
                 table.insert(content, object)
-            end
-        end
+            end)
+        end)
         ContentProvider:PreloadAsync(content)
         self:get_device()
 
@@ -815,15 +815,15 @@ function Library:create_ui()
             Connections['ui_scale_update'] = Workspace.CurrentCamera:GetPropertyChangedSignal('ViewportSize'):Connect(function()
                 self:get_screen_scale()
                 UIScale.Scale = self._ui_scale
-            end)
-        end
+            end))
+        end)
         AcrylicBlur.new(Container)
         self._ui_loaded = true
-    end
+    end)
 
     function self:update_tabs(tab, left_section_frame, right_section_frame)
         for _, object in Tabs:GetChildren() do
-            if object.Name ~= 'Tab' then continue end
+            if object.Name ~= 'Tab' then continue end)
             local section_order = object.LayoutOrder
             local left_section = Sections:FindFirstChild('LeftSection' .. section_order)
             local right_section = Sections:FindFirstChild('RightSection' .. section_order)
@@ -838,31 +838,31 @@ function Library:create_ui()
                     TweenService:Create(object.TextLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0.1, TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
                     TweenService:Create(object.TextLabel.UIGradient, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Offset = Vector2.new(1, 0)}):Play()
                     TweenService:Create(object.Icon, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0.1, ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-                end
-                if left_section then left_section.Visible = true end
-                if right_section then right_section.Visible = true end
+                end)
+                if left_section then left_section.Visible = true end)
+                if right_section then right_section.Visible = true end)
                 continue
-            end
+            end)
             if object.BackgroundTransparency ~= 1 then
                 TweenService:Create(object, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundTransparency = 1}):Play()
                 TweenService:Create(object.TextLabel, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {TextTransparency = 0.7, TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
                 TweenService:Create(object.TextLabel.UIGradient, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Offset = Vector2.new(0, 0)}):Play()
                 TweenService:Create(object.Icon, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {ImageTransparency = 0.8, ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-            end
-            if left_section then left_section.Visible = false end
-            if right_section then right_section.Visible = false end
-        end
-    end
+            end)
+            if left_section then left_section.Visible = false end)
+            if right_section then right_section.Visible = false end)
+        end)
+    end)
 
     function self:update_sections(left_section, right_section)
         for _, object in Sections:GetChildren() do
             if object == left_section or object == right_section then
                 object.Visible = true
                 continue
-            end
+            end)
             object.Visible = false
-        end
-    end
+        end)
+    end)
 
     function self:create_tab(title, icon)
         local TabManager = {}
@@ -992,12 +992,12 @@ function Library:create_ui()
         if first_tab then
             self:update_tabs(Tab, LeftSection, RightSection)
             self:update_sections(LeftSection, RightSection)
-        end
+        end)
 
         Tab.MouseButton1Click:Connect(function()
             self:update_tabs(Tab, LeftSection, RightSection)
             self:update_sections(LeftSection, RightSection)
-        end)
+        end))
 
         function TabManager:create_module(settings)
             local LayoutOrderModule = 0
@@ -1007,7 +1007,7 @@ function Library:create_ui()
                 settings.section = RightSection
             else
                 settings.section = LeftSection
-            end
+            end)
 
             local Module = Instance.new('Frame')
             Module.ClipsDescendants = true
@@ -1209,17 +1209,17 @@ function Library:create_ui()
 
                 Library._config._flags[settings.flag] = self._state
                 Config:save(game.GameId, Library._config)
-                if settings.callback then settings.callback(self._state) end
-            end
+                if settings.callback then settings.callback(self._state) end)
+            end)
             
             function ModuleManager:connect_keybind()
-                if not Library._config._keybinds[settings.flag] then return end
+                if not Library._config._keybinds[settings.flag] then return end)
                 Connections[settings.flag..'_keybind_module'] = UserInputService.InputBegan:Connect(function(input, process)
-                    if process then return end
-                    if tostring(input.KeyCode) ~= Library._config._keybinds[settings.flag] then return end
+                    if process then return end)
+                    if tostring(input.KeyCode) ~= Library._config._keybinds[settings.flag] then return end)
                     ModuleManager:change_state(not ModuleManager._state)
-                end)
-            end
+                end))
+            end)
 
             function ModuleManager:scale_keybind(empty)
                 if Library._config._keybinds[settings.flag] and not empty then
@@ -1235,8 +1235,8 @@ function Library:create_ui()
                 else
                     Keybind.Size = UDim2.fromOffset(31, 15)
                     TextLabel.Size = UDim2.fromOffset(25, 13)
-                end
-            end
+                end)
+            end)
 
             if Library:flag_type(settings.flag, 'boolean') then
                 ModuleManager._state = Library._config._flags[settings.flag]
@@ -1244,51 +1244,51 @@ function Library:create_ui()
                 local circlePos = ModuleManager._state and UDim2.fromScale(0.53, 0.5) or UDim2.fromScale(0, 0.5)
                 Circle.BackgroundColor3 = circleColor
                 Circle.Position = circlePos
-                if settings.callback then settings.callback(ModuleManager._state) end
-            end
+                if settings.callback then settings.callback(ModuleManager._state) end)
+            end)
 
             if Library._config._keybinds[settings.flag] then
                 local keybind_string = string.gsub(tostring(Library._config._keybinds[settings.flag]), 'Enum.KeyCode.', '')
                 TextLabel.Text = keybind_string
                 ModuleManager:connect_keybind()
                 ModuleManager:scale_keybind()
-            end
+            end)
 
             Connections[settings.flag..'_input_began_keybind_selection'] = Header.InputBegan:Connect(function(input)
-                if Library._choosing_keybind then return end
-                if input.UserInputType ~= Enum.UserInputType.MouseButton3 then return end
+                if Library._choosing_keybind then return end)
+                if input.UserInputType ~= Enum.UserInputType.MouseButton3 then return end)
                 
                 Library._choosing_keybind = true
                 Connections['keybind_choose_start_module'] = UserInputService.InputBegan:Connect(function(keyInput, process)
-                    if process or keyInput.UserInputType ~= Enum.UserInputType.Keyboard or keyInput.KeyCode == Enum.KeyCode.Unknown then return end
+                    if process or keyInput.UserInputType ~= Enum.UserInputType.Keyboard or keyInput.KeyCode == Enum.KeyCode.Unknown then return end)
                     
                     if keyInput.KeyCode == Enum.KeyCode.Backspace then
                         ModuleManager:scale_keybind(true)
                         Library._config._keybinds[settings.flag] = nil
                         Config:save(game.GameId, Library._config)
                         TextLabel.Text = 'None'
-                        if Connections[settings.flag..'_keybind_module'] then Connections[settings.flag..'_keybind_module']:Disconnect() end
+                        if Connections[settings.flag..'_keybind_module'] then Connections[settings.flag..'_keybind_module']:Disconnect() end)
                     else
                         Library._config._keybinds[settings.flag] = tostring(keyInput.KeyCode)
                         Config:save(game.GameId, Library._config)
-                        if Connections[settings.flag..'_keybind_module'] then Connections[settings.flag..'_keybind_module']:Disconnect() end
+                        if Connections[settings.flag..'_keybind_module'] then Connections[settings.flag..'_keybind_module']:Disconnect() end)
                         ModuleManager:connect_keybind()
                         ModuleManager:scale_keybind()
                         TextLabel.Text = string.gsub(tostring(Library._config._keybinds[settings.flag]), 'Enum.KeyCode.', '')
-                    end
+                    end)
                     Connections['keybind_choose_start_module']:Disconnect()
                     Library._choosing_keybind = false
-                end)
-            end)
+                end))
+            end))
 
             Header.MouseButton1Click:Connect(function()
                 ModuleManager:change_state(not ModuleManager._state)
-            end)
+            end))
 
             function ModuleManager:create_paragraph(settings)
                 LayoutOrderModule = LayoutOrderModule + 1
                 self._size += settings.customScale or 70
-                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end
+                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end)
                 Options.Size = UDim2.fromOffset(241, self._size)
             
                 local Paragraph = Instance.new('Frame')
@@ -1332,15 +1332,15 @@ function Library:create_ui()
                 Body.AutomaticSize = Enum.AutomaticSize.XY
                 Body.Parent = Paragraph
             
-                Paragraph.MouseEnter:Connect(function() TweenService:Create(Paragraph, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play() end)
-                Paragraph.MouseLeave:Connect(function() TweenService:Create(Paragraph, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(30, 30, 30)}):Play() end)
+                Paragraph.MouseEnter:Connect(function() TweenService:Create(Paragraph, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play() end))
+                Paragraph.MouseLeave:Connect(function() TweenService:Create(Paragraph, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(30, 30, 30)}):Play() end))
                 return {}
-            end
+            end)
 
             function ModuleManager:create_text(settings)
                 LayoutOrderModule = LayoutOrderModule + 1
                 self._size += settings.customScale or 50
-                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end
+                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end)
                 Options.Size = UDim2.fromOffset(241, self._size)
             
                 local TextFrame = Instance.new('Frame')
@@ -1371,15 +1371,15 @@ function Library:create_ui()
                 Body.AutomaticSize = Enum.AutomaticSize.XY
                 Body.Parent = TextFrame
             
-                TextFrame.MouseEnter:Connect(function() TweenService:Create(TextFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play() end)
-                TextFrame.MouseLeave:Connect(function() TweenService:Create(TextFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(30, 30, 30)}):Play() end)
+                TextFrame.MouseEnter:Connect(function() TweenService:Create(TextFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play() end))
+                TextFrame.MouseLeave:Connect(function() TweenService:Create(TextFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(30, 30, 30)}):Play() end))
                 return {}
-            end
+            end)
 
             function ModuleManager:create_textbox(settings)
                 LayoutOrderModule = LayoutOrderModule + 1
                 self._size += 32
-                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end
+                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end)
                 Options.Size = UDim2.fromOffset(241, self._size)
             
                 local Label = Instance.new('TextLabel')
@@ -1416,23 +1416,23 @@ function Library:create_ui()
                     Textbox.Text = text
                     Library._config._flags[settings.flag] = text
                     Config:save(game.GameId, Library._config)
-                    if settings.callback then settings.callback(text) end
-                end
+                    if settings.callback then settings.callback(text) end)
+                end)
             
                 if Library:flag_type(settings.flag, 'string') then
                     Textbox:update_text(Library._config._flags[settings.flag])
-                end
+                end)
             
                 Textbox.FocusLost:Connect(function()
                     Textbox:update_text(Textbox.Text)
-                end)
+                end))
                 return Textbox
-            end   
+            end)   
 
             function ModuleManager:create_checkbox(settings)
                 LayoutOrderModule = LayoutOrderModule + 1
                 self._size += 20
-                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end
+                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end)
                 Options.Size = UDim2.fromOffset(241, self._size)
             
                 local Checkbox = Instance.new("TextButton")
@@ -1527,54 +1527,54 @@ function Library:create_ui()
 
                     Library._config._flags[settings.flag] = Checkbox._state
                     Config:save(game.GameId, Library._config)
-                    if settings.callback then settings.callback(Checkbox._state) end
-                end
+                    if settings.callback then settings.callback(Checkbox._state) end)
+                end)
             
                 if Library:flag_type(settings.flag, "boolean") then
                     Checkbox:change_state(Library._config._flags[settings.flag])
-                end
+                end)
             
-                Checkbox.MouseButton1Click:Connect(function() Checkbox:change_state(not Checkbox._state) end)
+                Checkbox.MouseButton1Click:Connect(function() Checkbox:change_state(not Checkbox._state) end))
             
                 Checkbox.InputBegan:Connect(function(input, gameProcessed)
-                    if gameProcessed or input.UserInputType ~= Enum.UserInputType.MouseButton3 then return end
-                    if Library._choosing_keybind then return end
+                    if gameProcessed or input.UserInputType ~= Enum.UserInputType.MouseButton3 then return end)
+                    if Library._choosing_keybind then return end)
             
                     Library._choosing_keybind = true
                     local chooseConnection
                     chooseConnection = UserInputService.InputBegan:Connect(function(keyInput, processed)
-                        if processed or keyInput.UserInputType ~= Enum.UserInputType.Keyboard or keyInput.KeyCode == Enum.KeyCode.Unknown then return end
+                        if processed or keyInput.UserInputType ~= Enum.UserInputType.Keyboard or keyInput.KeyCode == Enum.KeyCode.Unknown then return end)
             
                         if keyInput.KeyCode == Enum.KeyCode.Backspace then
                             KeybindLabel.Text = "..."
                             Library._config._keybinds[settings.flag] = nil
                             Config:save(game.GameId, Library._config)
-                            if Connections[settings.flag .. "_keybind_checkbox"] then Connections[settings.flag .. "_keybind_checkbox"]:Disconnect() end
+                            if Connections[settings.flag .. "_keybind_checkbox"] then Connections[settings.flag .. "_keybind_checkbox"]:Disconnect() end)
                         else
                             Library._config._keybinds[settings.flag] = tostring(keyInput.KeyCode)
                             Config:save(game.GameId, Library._config)
-                            if Connections[settings.flag .. "_keybind_checkbox"] then Connections[settings.flag .. "_keybind_checkbox"]:Disconnect() end
+                            if Connections[settings.flag .. "_keybind_checkbox"] then Connections[settings.flag .. "_keybind_checkbox"]:Disconnect() end)
                             KeybindLabel.Text = string.gsub(tostring(Library._config._keybinds[settings.flag]), "Enum.KeyCode.", "")
-                        end
+                        end)
                         chooseConnection:Disconnect()
                         Library._choosing_keybind = false
-                    end)
-                end)
+                    end))
+                end))
             
                 Connections[settings.flag .. "_keypress_checkbox"] = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-                    if gameProcessed or input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+                    if gameProcessed or input.UserInputType ~= Enum.UserInputType.Keyboard then return end)
                     local storedKey = Library._config._keybinds[settings.flag]
                     if storedKey and tostring(input.KeyCode) == storedKey then
                         Checkbox:change_state(not Checkbox._state)
-                    end
-                end)
+                    end)
+                end))
                 return Checkbox
-            end
+            end)
 
             function ModuleManager:create_divider(settings)
                 LayoutOrderModule = LayoutOrderModule + 1
                 self._size += 27
-                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end
+                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end)
                 local dividerWidth = 207
             
                 local OuterFrame = Instance.new('Frame')
@@ -1602,7 +1602,7 @@ function Library:create_ui()
                     TextLabel.ZIndex = 3
                     TextLabel.TextStrokeTransparency = 0
                     TextLabel.Parent = OuterFrame
-                end
+                end)
                 
                 if not settings or settings and not settings.disableline then
                     local Divider = Instance.new('Frame')
@@ -1627,14 +1627,14 @@ function Library:create_ui()
                         NumberSequenceKeypoint.new(0.5, 0),
                         NumberSequenceKeypoint.new(1, 0.8)
                     })
-                end
+                end)
                 return {}
-            end
+            end)
 
             function ModuleManager:create_slider(settings)
                 LayoutOrderModule = LayoutOrderModule + 1
                 self._size += 40
-                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end
+                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end)
                 Options.Size = UDim2.fromOffset(241, self._size)
             
                 local SliderFrame = Instance.new('Frame')
@@ -1726,29 +1726,29 @@ function Library:create_ui()
                     Fill.Size = UDim2.new((value - settings.min) / (settings.max - settings.min), 0, 1, 0)
                     Handle.Position = UDim2.new((value - settings.min) / (settings.max - settings.min), 0, 0.5, 0)
             
-                    if settings.callback then settings.callback(value) end
+                    if settings.callback then settings.callback(value) end)
                     Library._config._flags[settings.flag] = value
                     Config:save(game.GameId, Library._config)
-                end
+                end)
             
                 Slider.InputBegan:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseButton1 then
                         is_dragging = true
                         update_slider_value(input.Position.X)
-                    end
-                end)
+                    end)
+                end))
             
                 Slider.InputChanged:Connect(function(input)
                     if is_dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
                         update_slider_value(input.Position.X)
-                    end
-                end)
+                    end)
+                end))
             
                 Slider.InputEnded:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseButton1 then
                         is_dragging = false
-                    end
-                end)
+                    end)
+                end))
             
                 if Library:flag_type(settings.flag, 'number') then
                     SliderFrame._value = Library._config._flags[settings.flag]
@@ -1757,21 +1757,21 @@ function Library:create_ui()
                     Library._config._flags[settings.flag] = settings.default
                     Config:save(game.GameId, Library._config)
                     update_slider_value(Slider.AbsolutePosition.X + Slider.AbsoluteSize.X * ((settings.default - settings.min) / (settings.max - settings.min)))
-                end
+                end)
 
-                function SliderFrame:Get() return SliderFrame._value end
+                function SliderFrame:Get() return SliderFrame._value end)
                 function SliderFrame:Set(value)
                     value = math.clamp(value, settings.min, settings.max)
                     value = math.round(value / settings.step) * settings.step
                     update_slider_value(Slider.AbsolutePosition.X + Slider.AbsoluteSize.X * ((value - settings.min) / (settings.max - settings.min)))
-                end
+                end)
                 return SliderFrame
-            end
+            end)
 
             function ModuleManager:create_dropdown(settings)
                 LayoutOrderModule = LayoutOrderModule + 1
                 self._size += 40
-                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end
+                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end)
                 Options.Size = UDim2.fromOffset(241, self._size)
             
                 local DropdownFrame = Instance.new('Frame')
@@ -1854,8 +1854,8 @@ function Library:create_ui()
                          TweenService:Create(Module, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {
                             Size = UDim2.fromOffset(241, 93 + self._size + self._multiplier)
                         }):Play()
-                    end
-                end
+                    end)
+                end)
             
                 CurrentSelection.MouseButton1Click:Connect(toggle_dropdown)
             
@@ -1875,33 +1875,33 @@ function Library:create_ui()
                         DropdownFrame._value = option_text
                         CurrentSelection.Text = option_text
                         toggle_dropdown()
-                        if settings.callback then settings.callback(option_text) end
+                        if settings.callback then settings.callback(option_text) end)
                         Library._config._flags[settings.flag] = option_text
                         Config:save(game.GameId, Library._config)
-                    end)
+                    end))
             
-                    OptionButton.MouseEnter:Connect(function() TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play() end)
-                    OptionButton.MouseLeave:Connect(function() TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(30, 30, 30)}):Play() end)
-                end
+                    OptionButton.MouseEnter:Connect(function() TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play() end))
+                    OptionButton.MouseLeave:Connect(function() TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(30, 30, 30)}):Play() end))
+                end)
             
                 if Library:flag_type(settings.flag, 'string') then
                     DropdownFrame._value = Library._config._flags[settings.flag]
                     CurrentSelection.Text = DropdownFrame._value
-                    if settings.callback then settings.callback(DropdownFrame._value) end
+                    if settings.callback then settings.callback(DropdownFrame._value) end)
                 else
                     Library._config._flags[settings.flag] = settings.default or settings.options[1]
                     Config:save(game.GameId, Library._config)
-                    if settings.callback then settings.callback(Library._config._flags[settings.flag]) end
-                end
+                    if settings.callback then settings.callback(Library._config._flags[settings.flag]) end)
+                end)
 
-                function DropdownFrame:Get() return DropdownFrame._value end
+                function DropdownFrame:Get() return DropdownFrame._value end)
                 return DropdownFrame
-            end
+            end)
 
             function ModuleManager:create_button(settings)
                 LayoutOrderModule = LayoutOrderModule + 1
                 self._size += 30
-                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end
+                if ModuleManager._state then Module.Size = UDim2.fromOffset(241, 93 + self._size) end)
                 Options.Size = UDim2.fromOffset(241, self._size)
             
                 local Button = Instance.new('TextButton')
@@ -1920,17 +1920,17 @@ function Library:create_ui()
                 UICorner.CornerRadius = UDim.new(0, 4)
                 UICorner.Parent = Button
             
-                Button.MouseButton1Click:Connect(function() if settings.callback then settings.callback() end end)
+                Button.MouseButton1Click:Connect(function() if settings.callback then settings.callback() end) end))
             
-                Button.MouseEnter:Connect(function() TweenService:Create(Button, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play() end)
-                Button.MouseLeave:Connect(function() TweenService:Create(Button, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play() end)
+                Button.MouseEnter:Connect(function() TweenService:Create(Button, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play() end))
+                Button.MouseLeave:Connect(function() TweenService:Create(Button, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(40, 40, 40)}):Play() end))
                 return {}
-            end
+            end)
             return ModuleManager
-        end
+        end)
         return TabManager
-    end
-end
+    end)
+end)
 
 -- Initialize UI Library and load it
 local Library = Library.new()
@@ -1947,14 +1947,14 @@ local autoParryModule = autoParryTab:create_module({
     title = "Auto Parry",
     description = "Automatically parry incoming balls.",
     flag = "AutoParry",
-    callback = function(state) getgenv().AutoParry = state end
+    callback = function(state) getgenv().AutoParry = state end)
 })
 
 autoParryModule:create_checkbox({
     title = "Random Accuracy",
     description = "Adds randomness to parry timing.",
     flag = "RandomParryAccuracy",
-    callback = function(state) getgenv().RandomParryAccuracyEnabled = state end
+    callback = function(state) getgenv().RandomParryAccuracyEnabled = state end)
 })
 
 autoParryModule:create_slider({
@@ -1962,7 +1962,7 @@ autoParryModule:create_slider({
     description = "Distance at which to attempt parry.",
     flag = "ParryDistanceThreshold",
     min = 5, max = 50, step = 0.5, default = 15, format = "%.1f studs",
-    callback = function(value) getgenv().ParryThreshold = value end
+    callback = function(value) getgenv().ParryThreshold = value end)
 })
 
 autoParryModule:create_dropdown({
@@ -1971,7 +1971,7 @@ autoParryModule:create_dropdown({
     flag = "ParryInputType",
     options = {"F_Key", "Click", "Remotes"},
     default = "F_Key",
-    callback = function(value) getgenv().ParryKey = value end
+    callback = function(value) getgenv().ParryKey = value end)
 })
 
 autoParryModule:create_divider({showtopic = true, title = "Advanced Detection"})
@@ -1980,21 +1980,21 @@ autoParryModule:create_checkbox({
     title = "Infinity Detection",
     description = "Detects and reacts to Infinity ability.",
     flag = "InfinityDetection",
-    callback = function(state) getgenv().InfinityDetection = state end
+    callback = function(state) getgenv().InfinityDetection = state end)
 })
 
 autoParryModule:create_checkbox({
     title = "Phantom V2 Anti",
     description = "Attempts to counter Phantom V2 ability.",
     flag = "PhantomV2Anti",
-    callback = function(state) getgenv().PhantomV2Detection = state end
+    callback = function(state) getgenv().PhantomV2Detection = state end)
 })
 
 autoParryModule:create_checkbox({
     title = "Time Hole Detection",
     description = "Detects and reacts to Time Hole ability.",
     flag = "TimeHoleDetection",
-    callback = function(state) getgenv().TimeHoleDetection = state end
+    callback = function(state) getgenv().TimeHoleDetection = state end)
 })
 
 
@@ -2008,9 +2008,9 @@ local flyModule = playerTab:create_module({
     callback = function(state)
         getgenv().FlyEnabled = state
         local char = Player.Character
-        if not char then return end
+        if not char then return end)
         local rootPart = char:FindFirstChild("HumanoidRootPart")
-        if not rootPart then return end
+        if not rootPart then return end)
 
         if state then
             getgenv().originalCameraSubject = Workspace.CurrentCamera.CameraSubject
@@ -2020,8 +2020,8 @@ local flyModule = playerTab:create_module({
             
             rootPart.CanCollide = false
             for _, part in ipairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then part.CanCollide = false end
-            end
+                if part:IsA("BasePart") then part.CanCollide = false end)
+            end)
 
             Connections['fly_render_step'] = RunService.RenderStepped:Connect(function()
                 if getgenv().FlyEnabled and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
@@ -2029,29 +2029,29 @@ local flyModule = playerTab:create_module({
                     local camera = Workspace.CurrentCamera
                     local moveVector = Vector3.new()
 
-                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveVector += camera.CFrame.lookVector end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveVector -= camera.CFrame.lookVector end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveVector -= camera.CFrame.rightVector end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveVector += camera.CFrame.rightVector end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.E) then moveVector += Vector3.new(0, 1, 0) end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.Q) then moveVector -= Vector3.new(0, 1, 0) end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveVector += camera.CFrame.lookVector end)
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveVector -= camera.CFrame.lookVector end)
+                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveVector -= camera.CFrame.rightVector end)
+                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveVector += camera.CFrame.rightVector end)
+                    if UserInputService:IsKeyDown(Enum.KeyCode.E) then moveVector += Vector3.new(0, 1, 0) end)
+                    if UserInputService:IsKeyDown(Enum.KeyCode.Q) then moveVector -= Vector3.new(0, 1, 0) end)
 
                     if moveVector.Magnitude > 0 then
                         root.CFrame = root.CFrame + moveVector.Unit * getgenv().FlySpeed * RunService.RenderStepped:Wait()
-                    end
-                end
-            end)
+                    end)
+                end)
+            end))
         else
-            if Connections['fly_render_step'] then Connections['fly_render_step']:Disconnect() end
+            if Connections['fly_render_step'] then Connections['fly_render_step']:Disconnect() end)
             rootPart.CanCollide = true
             for _, part in ipairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then part.CanCollide = true end
-            end
+                if part:IsA("BasePart") then part.CanCollide = true end)
+            end)
             Workspace.CurrentCamera.CameraSubject = getgenv().originalCameraSubject
             Workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
             Workspace.CurrentCamera.CFrame = getgenv().originalCFrame
-        end
-    end
+        end)
+    end)
 })
 
 flyModule:create_slider({
@@ -2059,7 +2059,7 @@ flyModule:create_slider({
     description = "Adjust the speed of flying.",
     flag = "FlySpeed",
     min = 10, max = 200, step = 5, default = 50, format = "%.0f studs/s",
-    callback = function(value) getgenv().FlySpeed = value end
+    callback = function(value) getgenv().FlySpeed = value end)
 })
 
 playerTab:create_divider({showtopic = true, title = "Other Movement"})
@@ -2071,14 +2071,14 @@ local noclipModule = playerTab:create_module({
     callback = function(state)
         getgenv().NoClipEnabled = state
         local char = Player.Character
-        if not char then return end
+        if not char then return end)
         local rootPart = char:FindFirstChild("HumanoidRootPart")
-        if not rootPart then return end
+        if not rootPart then return end)
         rootPart.CanCollide = not state
         for _, part in ipairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then part.CanCollide = not state end
-        end
-    end
+            if part:IsA("BasePart") then part.CanCollide = not state end)
+        end)
+    end)
 })
 
 local antiRagdollModule = playerTab:create_module({
@@ -2090,12 +2090,12 @@ local antiRagdollModule = playerTab:create_module({
         if state then
             Library.SendNotification({title = "Anti-Ragdoll", text = "Anti-Ragdoll enabled. Functionality depends on game physics.", duration = 2})
             local humanoid = Player.Character and Player.Character:FindFirstChildOfClass("Humanoid")
-            if humanoid then humanoid.BreakJointsOnDeath = false end
+            if humanoid then humanoid.BreakJointsOnDeath = false end)
         else
             local humanoid = Player.Character and Player.Character:FindFirstChildOfClass("Humanoid")
-            if humanoid then humanoid.BreakJointsOnDeath = true end
-        end
-    end
+            if humanoid then humanoid.BreakJointsOnDeath = true end)
+        end)
+    end)
 })
 
 -- COMBAT / AIM ASSIST
@@ -2105,7 +2105,7 @@ local silentAimModule = combatTab:create_module({
     title = "Silent Aim",
     description = "Aims for you without camera movement.",
     flag = "SilentAimToggle",
-    callback = function(state) getgenv().SilentAimEnabled = state end
+    callback = function(state) getgenv().SilentAimEnabled = state end)
 })
 
 silentAimModule:create_slider({
@@ -2113,7 +2113,7 @@ silentAimModule:create_slider({
     description = "Field of View for silent aim.",
     flag = "SilentAimFOV",
     min = 0, max = 360, step = 1, default = 90, format = "%.0f degrees",
-    callback = function(value) getgenv().SilentAimFOV = value end
+    callback = function(value) getgenv().SilentAimFOV = value end)
 })
 
 silentAimModule:create_dropdown({
@@ -2122,7 +2122,7 @@ silentAimModule:create_dropdown({
     flag = "SilentAimTargetPart",
     options = {"Head", "HumanoidRootPart", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg"},
     default = "HumanoidRootPart",
-    callback = function(value) getgenv().SilentAimTargetPart = value end
+    callback = function(value) getgenv().SilentAimTargetPart = value end)
 })
 
 silentAimModule:create_slider({
@@ -2130,28 +2130,28 @@ silentAimModule:create_slider({
     description = "Smoothness of the silent aim.",
     flag = "SilentAimSmoothness",
     min = 0, max = 1, step = 0.05, default = 0.5, format = "%.2f",
-    callback = function(value) getgenv().SilentAimSmoothness = value end
+    callback = function(value) getgenv().SilentAimSmoothness = value end)
 })
 
 silentAimModule:create_checkbox({
     title = "Ping Correction",
     description = "Corrects for your ping in aiming.",
     flag = "SilentAimPingCorrection",
-    callback = function(state) getgenv().SilentAimPingCorrection = state end
+    callback = function(state) getgenv().SilentAimPingCorrection = state end)
 })
 
 silentAimModule:create_checkbox({
     title = "Visible Only",
     description = "Only aims at visible targets.",
     flag = "SilentAimVisibleOnly",
-    callback = function(state) getgenv().SilentAimVisibleOnly = state end
+    callback = function(state) getgenv().SilentAimVisibleOnly = state end)
 })
 
 silentAimModule:create_checkbox({
     title = "Predict Movement",
     description = "Predicts target's future position.",
     flag = "SilentAimPredict",
-    callback = function(state) getgenv().SilentAimPredict = state end
+    callback = function(state) getgenv().SilentAimPredict = state end)
 })
 
 silentAimModule:create_divider({showtopic = true, title = "Hitbox"})
@@ -2163,17 +2163,17 @@ local hitboxExpanderModule = combatTab:create_module({
     callback = function(state)
         getgenv().HitboxExpanderEnabled = state
         local char = Player.Character
-        if not char then return end
+        if not char then return end)
         for _, part in ipairs(char:GetDescendants()) do
             if part:IsA("Part") or part:IsA("MeshPart") then
                 if state then
                     part.Size = part.Size * getgenv().HitboxExpanderSize
                 else
                     part.Size = part.Size / getgenv().HitboxExpanderSize
-                end
-            end
-        end
-    end
+                end)
+            end)
+        end)
+    end)
 })
 
 hitboxExpanderModule:create_slider({
@@ -2181,7 +2181,7 @@ hitboxExpanderModule:create_slider({
     description = "How much to expand the hitbox.",
     flag = "HitboxExpanderSize",
     min = 1, max = 5, step = 0.1, default = 1.2, format = "x%.1f",
-    callback = function(value) getgenv().HitboxExpanderSize = value end
+    callback = function(value) getgenv().HitboxExpanderSize = value end)
 })
 
 -- AUTO CLICKER
@@ -2198,12 +2198,12 @@ local autoClickerModule = combatTab:create_module({
                     task.wait(getgenv().AutoClickerDelay)
                     VirtualInputManager:SendMouseEvent(mouse.X, mouse.Y, 0, false, 0)
                     task.wait(getgenv().AutoClickerDelay)
-                end
-            end)
+                end)
+            end))
         else
-            if InputTask then task.cancel(InputTask) end
-        end
-    end
+            if InputTask then task.cancel(InputTask) end)
+        end)
+    end)
 })
 
 autoClickerModule:create_slider({
@@ -2211,7 +2211,7 @@ autoClickerModule:create_slider({
     description = "Delay between clicks in seconds.",
     flag = "AutoClickerDelay",
     min = 0.01, max = 1, step = 0.01, default = 0.05, format = "%.2f s",
-    callback = function(value) getgenv().AutoClickerDelay = value end
+    callback = function(value) getgenv().AutoClickerDelay = value end)
 })
 
 autoClickerModule:create_dropdown({
@@ -2220,7 +2220,7 @@ autoClickerModule:create_dropdown({
     flag = "AutoClickerButton",
     options = {"MouseButton1", "MouseButton2"},
     default = "MouseButton1",
-    callback = function(value) getgenv().AutoClickerButton = Enum.UserInputType[value] end
+    callback = function(value) getgenv().AutoClickerButton = Enum.UserInputType[value] end)
 })
 
 -- ABILITIES / EXPLOITS
@@ -2230,28 +2230,28 @@ local autoAbilityModule = abilitiesTab:create_module({
     title = "Auto Ability",
     description = "Automatically uses your equipped ability.",
     flag = "AutoAbilityToggle",
-    callback = function(state) getgenv().AutoAbility = state end
+    callback = function(state) getgenv().AutoAbility = state end)
 })
 
 autoAbilityModule:create_checkbox({
     title = "Cooldown Protection",
     description = "Attempts to bypass ability cooldowns.",
     flag = "CooldownProtectionToggle",
-    callback = function(state) getgenv().CooldownProtection = state end
+    callback = function(state) getgenv().CooldownProtection = state end)
 })
 
 autoAbilityModule:create_checkbox({
     title = "Thunder Dash No Cooldown",
     description = "Enables Thunder Dash without cooldown.",
     flag = "ThunderDashNoCooldownToggle",
-    callback = function(state) getgenv().ThunderDashNoCooldown = state end
+    callback = function(state) getgenv().ThunderDashNoCooldown = state end)
 })
 
 autoAbilityModule:create_checkbox({
     title = "Continuity Zero Exploit",
     description = "Enables Continuity Zero exploit.",
     flag = "ContinuityZeroExploitToggle",
-    callback = function(state) getgenv().ContinuityZeroExploit = state end
+    callback = function(state) getgenv().ContinuityZeroExploit = state end)
 })
 
 -- VISUALS / MISC
@@ -2261,14 +2261,14 @@ local abilityEspModule = visualsTab:create_module({
     title = "Ability ESP",
     description = "Shows ESP for active abilities.",
     flag = "AbilityESPToggle",
-    callback = function(state) getgenv().AbilityESP = state end
+    callback = function(state) getgenv().AbilityESP = state end)
 })
 
 local worldFilterModule = visualsTab:create_module({
     title = "World Filters",
     description = "Applies visual filters to the game world.",
     flag = "WorldFilterToggle",
-    callback = function(state) getgenv().WorldFilterEnabled = state end
+    callback = function(state) getgenv().WorldFilterEnabled = state end)
 })
 
 worldFilterModule:create_checkbox({
@@ -2279,7 +2279,7 @@ worldFilterModule:create_checkbox({
         getgenv().AtmosphereEnabled = state
         local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere") or Instance.new("Atmosphere", Lighting)
         atmosphere.Enabled = state
-    end
+    end)
 })
 
 worldFilterModule:create_checkbox({
@@ -2290,8 +2290,8 @@ worldFilterModule:create_checkbox({
         getgenv().FogEnabled = state
         local fog = Lighting:FindFirstChildOfClass("Fog") or Instance.new("Fog", Lighting)
         fog.Enabled = state
-        if state then fog.Color = Color3.fromRGB(0,0,0); fog.End = 500; fog.Start = 100 end
-    end
+        if state then fog.Color = Color3.fromRGB(0,0,0); fog.End = 500; fog.Start = 100 end)
+    end)
 })
 
 worldFilterModule:create_slider({
@@ -2304,7 +2304,7 @@ worldFilterModule:create_slider({
         local cc = Lighting:FindFirstChildOfClass("ColorCorrectionEffect") or Instance.new("ColorCorrectionEffect", Lighting)
         cc.Enabled = true
         cc.Saturation = value
-    end
+    end)
 })
 
 worldFilterModule:create_slider({
@@ -2317,21 +2317,21 @@ worldFilterModule:create_slider({
         local cc = Lighting:FindFirstChildOfClass("ColorCorrectionEffect") or Instance.new("ColorCorrectionEffect", Lighting)
         cc.Enabled = true
         cc.TintColor = Color3.fromHSV(value, 1, 1)
-    end
+    end)
 })
 
 local soundModule = visualsTab:create_module({
     title = "Sound Customization",
     description = "Customize in-game sounds.",
     flag = "SoundToggle",
-    callback = function(state) getgenv().soundmodule = state end
+    callback = function(state) getgenv().soundmodule = state end)
 })
 
 soundModule:create_checkbox({
     title = "Hit Sound",
     description = "Plays a sound on hitting an opponent.",
     flag = "HitSoundToggle",
-    callback = function(state) getgenv().hit_Sound_Enabled = state end
+    callback = function(state) getgenv().hit_Sound_Enabled = state end)
 })
 
 soundModule:create_slider({
@@ -2339,7 +2339,7 @@ soundModule:create_slider({
     description = "Volume of hit sound.",
     flag = "HitSoundVolume",
     min = 0, max = 1, step = 0.05, default = 0.5, format = "%.2f",
-    callback = function(value) getgenv().HitSoundVolume = value end
+    callback = function(value) getgenv().HitSoundVolume = value end)
 })
 
 -- MISCELLANEOUS
@@ -2351,8 +2351,8 @@ local serverHopModule = miscTab:create_module({
     flag = "AutoServerHopToggle",
     callback = function(state)
         getgenv().AutoServerHop = state
-        if state then Library.SendNotification({title = "Auto Server Hop", text = "Auto Server Hop enabled. This will attempt to teleport you to a new server.", duration = 3}) end
-    end
+        if state then Library.SendNotification({title = "Auto Server Hop", text = "Auto Server Hop enabled. This will attempt to teleport you to a new server.", duration = 3}) end)
+    end)
 })
 
 local autoVoteModule = miscTab:create_module({
@@ -2361,36 +2361,36 @@ local autoVoteModule = miscTab:create_module({
     flag = "AutoVoteToggle",
     callback = function(state)
         getgenv().AutoVote = state
-        if state then Library.SendNotification({title = "Auto Vote", text = "Auto Vote enabled. This might not work on all games.", duration = 3}) end
-    end
+        if state then Library.SendNotification({title = "Auto Vote", text = "Auto Vote enabled. This might not work on all games.", duration = 3}) end)
+    end)
 })
 
 local skinChangerModule = miscTab:create_module({
     title = "Skin Changer",
     description = "Changes your sword model and animations.",
     flag = "SkinChangerToggle",
-    callback = function(state) getgenv().skinChanger = state end
+    callback = function(state) getgenv().skinChanger = state end)
 })
 
 skinChangerModule:create_textbox({
     title = "Sword Model ID",
     placeholder = "Enter Asset ID",
     flag = "SwordModelID",
-    callback = function(value) getgenv().swordModel = value end
+    callback = function(value) getgenv().swordModel = value end)
 })
 
 skinChangerModule:create_textbox({
     title = "Sword Animation ID",
     placeholder = "Enter Asset ID",
     flag = "SwordAnimationID",
-    callback = function(value) getgenv().swordAnimations = value end
+    callback = function(value) getgenv().swordAnimations = value end)
 })
 
 skinChangerModule:create_textbox({
     title = "Sword FX ID",
     placeholder = "Enter Asset ID",
     flag = "SwordFXID",
-    callback = function(value) getgenv().swordFX = value end
+    callback = function(value) getgenv().swordFX = value end)
 })
 
 
@@ -2401,16 +2401,16 @@ skinChangerModule:create_textbox({
 RunService.RenderStepped:Connect(function()
     if getgenv().AutoAbility then
         -- Game-specific: Logic to use ability
-    end
-end)
+    end)
+end))
 
 RunService.RenderStepped:Connect(function()
-    if not getgenv().SilentAimEnabled then return end
+    if not getgenv().SilentAimEnabled then return end)
 
     local target = nil
     local shortestDistance = math.huge
     local playerChar = Player.Character
-    if not playerChar or not playerChar:FindFirstChild("HumanoidRootPart") then return end
+    if not playerChar or not playerChar:FindFirstChild("HumanoidRootPart") then return end)
     local localHRP = playerChar.HumanoidRootPart
 
     for _, p in Players:GetPlayers() do
@@ -2433,17 +2433,17 @@ RunService.RenderStepped:Connect(function()
                                 if rayResult and rayResult.Instance:IsDescendantOf(p.Character) then
                                     target = p.Character
                                     shortestDistance = distance
-                                end
+                                end)
                             else
                                 target = p.Character
                                 shortestDistance = distance
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
+                            end)
+                        end)
+                    end)
+                end)
+            end)
+        end)
+    end)
 
     if target and target:FindFirstChild(getgenv().SilentAimTargetPart) then
         local targetPosition = target[getgenv().SilentAimTargetPart].Position
@@ -2453,9 +2453,9 @@ RunService.RenderStepped:Connect(function()
             local predictionTime = (localHRP.Position - targetPosition).Magnitude / getgenv().SilentAimVelocity
             if getgenv().SilentAimPingCorrection then
                 predictionTime += (Network.ServerStatsItem['Data Ping']:GetValue() or 0) / 1000
-            end
+            end)
             targetPosition = targetPosition + targetVelocity * predictionTime
-        end
+        end)
 
         local currentMousePos = mouse.Hit.p
         local desiredScreenPos, _ = Workspace.CurrentCamera:WorldToScreenPoint(targetPosition)
@@ -2464,8 +2464,8 @@ RunService.RenderStepped:Connect(function()
         local lerpedY = currentMousePos.Y + (desiredScreenPos.Y - currentMousePos.Y) * getgenv().SilentAimSmoothness
 
         VirtualInputManager:SendMouseEvent(lerpedX, lerpedY, 0, false, 0)
-    end
-end)
+    end)
+end))
 
 -- Sound Module / Loop Song
 if getgenv().soundmodule then
@@ -2477,14 +2477,14 @@ if getgenv().soundmodule then
         backgroundMusic.Volume = 0.3
         backgroundMusic.Looped = true
         backgroundMusic.Parent = SoundService
-    end
+    end)
     if backgroundMusic.PlaybackState ~= Enum.PlaybackState.Playing then
         backgroundMusic:Play()
-    end
+    end)
 else
     local backgroundMusic = SoundService:FindFirstChild("BackgroundMusic")
     if backgroundMusic and backgroundMusic.PlaybackState == Enum.PlaybackState.Playing then
         backgroundMusic:Stop()
         backgroundMusic:Destroy()
-    end
-end
+    end)
+end)
