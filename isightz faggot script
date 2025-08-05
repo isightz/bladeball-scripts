@@ -1,210 +1,179 @@
--- Auto-execute main script on UI run
+-- Auto-load script on startup
 loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-No-Ability-Cooldown-Open-Sourced-47339"))()
 
--- Services
+-- Create UI
+local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
 
-local player = Players.LocalPlayer
-local mouse = player:GetMouse()
+-- Create GUI base
+local gui = Instance.new("ScreenGui", CoreGui)
+gui.Name = "iSightsHypershotUI"
+gui.ResetOnSpawn = false
 
--- Create ScreenGui
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "iSightsHypershotUtility"
-ScreenGui.Parent = game.CoreGui
-ScreenGui.ResetOnSpawn = false
+-- Minimized Button
+local miniBtn = Instance.new("ImageButton")
+miniBtn.Parent = gui
+miniBtn.Size = UDim2.new(0, 40, 0, 40)
+miniBtn.Position = UDim2.new(0, 10, 0, 100)
+miniBtn.Image = "rbxassetid://3926305904" -- delta-style icon (edit as needed)
+miniBtn.ImageRectOffset = Vector2.new(124, 204)
+miniBtn.ImageRectSize = Vector2.new(36, 36)
+miniBtn.BackgroundTransparency = 1
+miniBtn.Visible = false
 
--- Draggable Icon (for minimize)
-local Icon = Instance.new("TextButton")
-Icon.Name = "MiniIcon"
-Icon.Text = "📱"
-Icon.Size = UDim2.new(0, 40, 0, 40)
-Icon.Position = UDim2.new(0, 10, 0, 10)
-Icon.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Icon.TextColor3 = Color3.fromRGB(255, 255, 255)
-Icon.BackgroundTransparency = 0.3
-Icon.Visible = false
-Icon.Parent = ScreenGui
+-- Main UI Frame
+local mainFrame = Instance.new("Frame", gui)
+mainFrame.Size = UDim2.new(0, 500, 0, 320)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -160)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.BackgroundTransparency = 0.2
+mainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.Active = true
+mainFrame.Draggable = true
 
--- Main Frame
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 400, 0, 300)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-MainFrame.BackgroundTransparency = 0.2
-MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-MainFrame.Parent = ScreenGui
+-- Top Bar
+local topBar = Instance.new("Frame", mainFrame)
+topBar.Size = UDim2.new(1, 0, 0, 35)
+topBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 
--- UICorner
-local UICorner = Instance.new("UICorner", MainFrame)
-
--- Title
-local Title = Instance.new("TextLabel")
-Title.Text = "iSights Hypershot Utility"
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 18
-Title.Size = UDim2.new(1, -40, 0, 30)
-Title.Position = UDim2.new(0, 10, 0, 5)
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.BackgroundTransparency = 1
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.Parent = MainFrame
+local title = Instance.new("TextLabel", topBar)
+title.Text = "iSights Hypershot Utility"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundTransparency = 1
+title.Size = UDim2.new(1, -40, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Minimize Button
-local Minimize = Instance.new("TextButton")
-Minimize.Text = "-"
-Minimize.Font = Enum.Font.GothamBold
-Minimize.TextSize = 18
-Minimize.Size = UDim2.new(0, 30, 0, 30)
-Minimize.Position = UDim2.new(1, -35, 0, 5)
-Minimize.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
-Minimize.Parent = MainFrame
+local minimize = Instance.new("TextButton", topBar)
+minimize.Size = UDim2.new(0, 30, 1, 0)
+minimize.Position = UDim2.new(1, -35, 0, 0)
+minimize.Text = "-"
+minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimize.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+minimize.Font = Enum.Font.Gotham
+minimize.TextSize = 20
 
--- Tabs
-local Tabs = Instance.new("Frame")
-Tabs.Size = UDim2.new(0, 100, 1, -40)
-Tabs.Position = UDim2.new(0, 0, 0, 40)
-Tabs.BackgroundTransparency = 1
-Tabs.Parent = MainFrame
+-- Left Tab Bar
+local tabBar = Instance.new("Frame", mainFrame)
+tabBar.Size = UDim2.new(0, 120, 1, -35)
+tabBar.Position = UDim2.new(0, 0, 0, 35)
+tabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 
-local Content = Instance.new("Frame")
-Content.Size = UDim2.new(1, -100, 1, -40)
-Content.Position = UDim2.new(0, 100, 0, 40)
-Content.BackgroundTransparency = 1
-Content.Parent = MainFrame
+-- Right Content Area
+local contentFrame = Instance.new("Frame", mainFrame)
+contentFrame.Size = UDim2.new(1, -120, 1, -35)
+contentFrame.Position = UDim2.new(0, 120, 0, 35)
+contentFrame.BackgroundTransparency = 1
 
 -- Tab Buttons
-local function createTabButton(name)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(1, 0, 0, 40)
-    button.Text = name
-    button.Font = Enum.Font.Gotham
-    button.TextSize = 14
-    button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.AutoButtonColor = false
-    button.Parent = Tabs
+local infoTabBtn = Instance.new("TextButton", tabBar)
+infoTabBtn.Size = UDim2.new(1, 0, 0, 40)
+infoTabBtn.Position = UDim2.new(0, 0, 0, 0)
+infoTabBtn.Text = "Info"
+infoTabBtn.Font = Enum.Font.Gotham
+infoTabBtn.TextSize = 14
+infoTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+infoTabBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 
-    button.MouseEnter:Connect(function()
-        button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    end)
-    button.MouseLeave:Connect(function()
-        button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    end)
+local mainTabBtn = Instance.new("TextButton", tabBar)
+mainTabBtn.Size = UDim2.new(1, 0, 0, 40)
+mainTabBtn.Position = UDim2.new(0, 0, 0, 40)
+mainTabBtn.Text = "Main"
+mainTabBtn.Font = Enum.Font.Gotham
+mainTabBtn.TextSize = 14
+mainTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+mainTabBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 
-    return button
-end
+-- Info Page
+local infoPage = Instance.new("TextLabel", contentFrame)
+infoPage.Size = UDim2.new(1, -20, 1, -20)
+infoPage.Position = UDim2.new(0, 10, 0, 10)
+infoPage.TextWrapped = true
+infoPage.TextXAlignment = Enum.TextXAlignment.Left
+infoPage.TextYAlignment = Enum.TextYAlignment.Top
+infoPage.BackgroundTransparency = 1
+infoPage.TextColor3 = Color3.fromRGB(255, 255, 255)
+infoPage.Font = Enum.Font.Gotham
+infoPage.TextSize = 14
+infoPage.Text = [[
+Made by iSight, ZYX, and Imran
 
--- Pages
-local Pages = {}
+Usage:
+- Enable "Auto Farm" from Main tab.
+- Make sure "Auto Reload" ability is on your first slot.
+- UI auto-loads script when executed.
+]]
 
--- Main Tab
-Pages.Main = Instance.new("Frame")
-Pages.Main.Size = UDim2.new(1, 0, 1, 0)
-Pages.Main.BackgroundTransparency = 1
-Pages.Main.Visible = true
-Pages.Main.Parent = Content
+-- Main Page
+local mainPage = Instance.new("Frame", contentFrame)
+mainPage.Size = UDim2.new(1, 0, 1, 0)
+mainPage.Position = UDim2.new(0, 0, 0, 0)
+mainPage.BackgroundTransparency = 1
+mainPage.Visible = false
 
-local autoFarmToggle = false
-local AutoFarmButton = Instance.new("TextButton")
-AutoFarmButton.Text = "Auto Farm: OFF"
-AutoFarmButton.Size = UDim2.new(0, 200, 0, 40)
-AutoFarmButton.Position = UDim2.new(0, 20, 0, 20)
-AutoFarmButton.Font = Enum.Font.Gotham
-AutoFarmButton.TextSize = 14
-AutoFarmButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-AutoFarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoFarmButton.Parent = Pages.Main
+-- Auto Farm Toggle
+local autoFarmOn = false
+local autoFarmThread = nil
 
-AutoFarmButton.MouseButton1Click:Connect(function()
-    autoFarmToggle = not autoFarmToggle
-    if autoFarmToggle then
-        AutoFarmButton.Text = "Auto Farm: ON"
-        loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
+local autoFarmBtn = Instance.new("TextButton", mainPage)
+autoFarmBtn.Size = UDim2.new(0, 200, 0, 40)
+autoFarmBtn.Position = UDim2.new(0, 10, 0, 10)
+autoFarmBtn.Text = "Auto Farm: OFF"
+autoFarmBtn.Font = Enum.Font.Gotham
+autoFarmBtn.TextSize = 14
+autoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+autoFarmBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+
+autoFarmBtn.MouseButton1Click:Connect(function()
+    autoFarmOn = not autoFarmOn
+    if autoFarmOn then
+        autoFarmBtn.Text = "Auto Farm: ON"
+        autoFarmThread = coroutine.create(function()
+            repeat
+                loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
+                wait(5) -- re-run every 5 seconds
+            until not autoFarmOn
+        end)
+        coroutine.resume(autoFarmThread)
     else
-        AutoFarmButton.Text = "Auto Farm: OFF"
-        -- Optional: You can add logic to pause/stop script here
+        autoFarmBtn.Text = "Auto Farm: OFF"
+        autoFarmOn = false
     end
 end)
 
--- Info Tab
-Pages.Info = Instance.new("Frame")
-Pages.Info.Size = UDim2.new(1, 0, 1, 0)
-Pages.Info.BackgroundTransparency = 1
-Pages.Info.Visible = false
-Pages.Info.Parent = Content
-
-local InfoLabel = Instance.new("TextLabel")
-InfoLabel.Size = UDim2.new(1, -20, 1, -20)
-InfoLabel.Position = UDim2.new(0, 10, 0, 10)
-InfoLabel.BackgroundTransparency = 1
-InfoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-InfoLabel.Font = Enum.Font.Gotham
-InfoLabel.TextWrapped = true
-InfoLabel.TextXAlignment = Enum.TextXAlignment.Left
-InfoLabel.TextYAlignment = Enum.TextYAlignment.Top
-InfoLabel.TextSize = 14
-InfoLabel.Text = [[
-Made by iSight, ZYX & Imran
-
-Usage:
-- Use the "Auto Farm" button on the Main tab.
-- Make sure you have the "Auto Reload" ability on your first slot.
-- Auto script loads when you open the UI.
-]]
-InfoLabel.Parent = Pages.Info
-
--- Create and switch tabs
-local buttons = {
-    Main = createTabButton("Main"),
-    Info = createTabButton("Info")
-}
-
-local tabList = {"Main", "Info"}
-
-for i, tabName in ipairs(tabList) do
-    buttons[tabName].Position = UDim2.new(0, 0, 0, (i - 1) * 40)
-    buttons[tabName].MouseButton1Click:Connect(function()
-        for name, page in pairs(Pages) do
-            page.Visible = (name == tabName)
-        end
-    end)
-end
-
--- Hide / Show Logic
-Minimize.MouseButton1Click:Connect(function()
-    MainFrame.Visible = false
-    Icon.Visible = true
+-- Tab Switch Logic
+infoTabBtn.MouseButton1Click:Connect(function()
+    infoPage.Visible = true
+    mainPage.Visible = false
 end)
 
-Icon.MouseButton1Click:Connect(function()
-    MainFrame.Visible = true
-    Icon.Visible = false
+mainTabBtn.MouseButton1Click:Connect(function()
+    infoPage.Visible = false
+    mainPage.Visible = true
+end)
+
+-- Minimize logic
+minimize.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    miniBtn.Visible = true
+end)
+
+miniBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    miniBtn.Visible = false
 end)
 
 -- Draggable Mini Icon
-local dragging = false
-local dragInput, dragStart, startPos
+local dragging, dragInput, startPos, startInputPos
 
-Icon.InputBegan:Connect(function(input)
+miniBtn.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
-        dragStart = input.Position
-        startPos = Icon.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
+        startInputPos = input.Position
+        startPos = miniBtn.Position
 
-Icon.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        Icon.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-                                  startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
+        input
