@@ -177,193 +177,24 @@ autoFarmBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Auto Clicker Button (clone of Auto Farm Btn)
-local autoClickerBtn = autoFarmBtn:Clone()
-autoClickerBtn.Text = "Auto Clicker"
-autoClickerBtn.Position = UDim2.new(0.5, -100, 0.55, 0)
-autoClickerBtn.Parent = pages["⚙️ Main"]
+-- Auto Clicker Buttons (Modified as per request)
 
--- Auto Clicker UI Popup
-local clickerUI = Instance.new("Frame", gui)
-clickerUI.Size = UDim2.new(0, 300, 0, 260)
-clickerUI.Position = UDim2.new(0.5, -150, 0.5, -130)
-clickerUI.BackgroundColor3 = Color3.fromRGB(28, 28, 48)
-clickerUI.Visible = false
-clickerUI.Active = true
-clickerUI.Draggable = true
-Instance.new("UICorner", clickerUI).CornerRadius = UDim.new(0, 8)
+-- zyx auto clicker button (replaces old auto clicker)
+local zyxAutoClickerBtn = autoFarmBtn:Clone()
+zyxAutoClickerBtn.Text = "zyx auto clicker"
+zyxAutoClickerBtn.Position = UDim2.new(0.5, -100, 0.55, 0)
+zyxAutoClickerBtn.Parent = pages["⚙️ Main"]
 
-local title = Instance.new("TextLabel", clickerUI)
-title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "Auto Clicker"
-title.BackgroundTransparency = 1
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 18
-
-local minimize = Instance.new("TextButton", clickerUI)
-minimize.Size = UDim2.new(0, 30, 0, 30)
-minimize.Position = UDim2.new(1, -35, 0, 5)
-minimize.Text = "-"
-minimize.Font = Enum.Font.GothamBold
-minimize.TextSize = 16
-minimize.BackgroundColor3 = Color3.fromRGB(60, 60, 90)
-minimize.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", minimize).CornerRadius = UDim.new(1, 0)
-
-local delayBox = Instance.new("TextBox", clickerUI)
-delayBox.Size = UDim2.new(0, 260, 0, 30)
-delayBox.Position = UDim2.new(0, 20, 0, 50)
-delayBox.PlaceholderText = "Click Delay (seconds)"
-delayBox.TextColor3 = Color3.new(1, 1, 1)
-delayBox.BackgroundColor3 = Color3.fromRGB(40, 40, 80)
-delayBox.Font = Enum.Font.Gotham
-delayBox.TextSize = 14
-Instance.new("UICorner", delayBox).CornerRadius = UDim.new(0, 6)
-
-local setBtn = Instance.new("TextButton", clickerUI)
-setBtn.Size = UDim2.new(0, 260, 0, 30)
-setBtn.Position = UDim2.new(0, 20, 0, 90)
-setBtn.Text = "Set Points (Tap Anywhere)"
-setBtn.Font = Enum.Font.Gotham
-setBtn.TextColor3 = Color3.new(1, 1, 1)
-setBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 100)
-Instance.new("UICorner", setBtn).CornerRadius = UDim.new(0, 6)
-
-local clearBtn = setBtn:Clone()
-clearBtn.Position = UDim2.new(0, 20, 0, 130)
-clearBtn.Text = "Delete All Points"
-clearBtn.Parent = clickerUI
-
-local runBtn = setBtn:Clone()
-runBtn.Position = UDim2.new(0, 20, 0, 170)
-runBtn.Text = "Start Clicking"
-runBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
-runBtn.Font = Enum.Font.GothamBold
-runBtn.Parent = clickerUI
-
--- Transparent overlay frame for tap-through during point setting
-local tapOverlay = Instance.new("Frame", gui)
-tapOverlay.Size = UDim2.new(1, 0, 1, 0)
-tapOverlay.BackgroundTransparency = 1
-tapOverlay.Visible = false
-tapOverlay.ZIndex = 1000
-tapOverlay.Active = true
-tapOverlay.Selectable = true
-
-local clickPoints = {}
-local indicators = {}
-local clicking = false
-local setPointsConnection
-
-local function clearPoints()
-    for _, dot in pairs(indicators) do
-        dot:Destroy()
-    end
-    indicators = {}
-    clickPoints = {}
-end
-
-local function createDotAtPos(pos)
-    local dot = Instance.new("Frame", gui)
-    dot.Size = UDim2.new(0, 12, 0, 12)
-    dot.Position = UDim2.new(0, pos.X - 6, 0, pos.Y - 6)
-    dot.BackgroundColor3 = Color3.new(1, 1, 1)
-    dot.BorderSizePixel = 0
-    dot.ZIndex = 9999
-    Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
-    return dot
-end
-
--- Set Points Mode: Lasts 5 seconds after pressing Set Points button
-setBtn.MouseButton1Click:Connect(function()
-    if setPointsConnection then
-        return -- Already running, ignore
-    end
-
-    tapOverlay.Visible = true
-    setBtn.Text = "Tap points anywhere... (5s left)"
-
-    local secondsLeft = 5
-    -- Countdown timer to auto-stop setting mode
-    local countdown = RunService.Heartbeat:Connect(function(dt)
-        secondsLeft = secondsLeft - dt
-        if secondsLeft <= 0 then
-            -- Stop setting points
-            tapOverlay.Visible = false
-            setBtn.Text = "Set Points (Tap Anywhere)"
-            if setPointsConnection then
-                setPointsConnection:Disconnect()
-                setPointsConnection = nil
-            end
-            countdown:Disconnect()
-        else
-            setBtn.Text = string.format("Tap points anywhere... (%.1fs left)", secondsLeft)
-        end
-    end)
-
-    setPointsConnection = tapOverlay.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local pos = input.Position
-            table.insert(clickPoints, pos)
-            local dot = createDotAtPos(pos)
-            table.insert(indicators, dot)
-        end
-    end)
+zyxAutoClickerBtn.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Auto-clicker-38704"))()
 end)
 
-clearBtn.MouseButton1Click:Connect(function()
-    clearPoints()
-end)
+-- New button: isigts auto clicker
+local isigtsAutoClickerBtn = autoFarmBtn:Clone()
+isigtsAutoClickerBtn.Text = "isigts auto clicker"
+isigtsAutoClickerBtn.Position = UDim2.new(0.5, -100, 0.7, 0)
+isigtsAutoClickerBtn.Parent = pages["⚙️ Main"]
 
-runBtn.MouseButton1Click:Connect(function()
-    if clicking then
-        clicking = false
-        runBtn.Text = "Start Clicking"
-        return
-    end
-
-    if #clickPoints == 0 then
-        runBtn.Text = "Set at least 1 point!"
-        task.delay(2, function()
-            if not clicking then
-                runBtn.Text = "Start Clicking"
-            end
-        end)
-        return
-    end
-
-    clicking = true
-    runBtn.Text = "Stop Clicking"
-
-    local delayTime = tonumber(delayBox.Text) or 1
-    local UIS = game:GetService("UserInputService")
-
-    coroutine.wrap(function()
-        while clicking do
-            for _, pos in ipairs(clickPoints) do
-                if not clicking then break end
-                UIS:SendMouseButtonEvent(pos.X, pos.Y, true, true)  -- Press
-                task.wait(0.03)
-                UIS:SendMouseButtonEvent(pos.X, pos.Y, false, true) -- Release
-                task.wait(delayTime)
-            end
-        end
-    end)()
-end)
-
-minimize.MouseButton1Click:Connect(function()
-    clickerUI.Visible = false
-    clicking = false
-    if setPointsConnection then
-        setPointsConnection:Disconnect()
-        setPointsConnection = nil
-    end
-    tapOverlay.Visible = false
-    runBtn.Text = "Start Clicking"
-    setBtn.Text = "Set Points (Tap Anywhere)"
-end)
-
-autoClickerBtn.MouseButton1Click:Connect(function()
-    clickerUI.Visible = not clickerUI.Visible
+isigtsAutoClickerBtn.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Auto-Clicker-Gui-9115"))()
 end)
