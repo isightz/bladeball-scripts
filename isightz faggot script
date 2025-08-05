@@ -8,6 +8,7 @@ local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
 
 local gui = Instance.new("ScreenGui", CoreGui)
 gui.Name = "iSightsHypershotUtility"
@@ -241,10 +242,19 @@ runBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
 runBtn.Font = Enum.Font.GothamBold
 runBtn.Parent = clickerUI
 
--- Variables for points and indicators
+-- Transparent overlay frame for tap-through during point setting
+local tapOverlay = Instance.new("Frame", gui)
+tapOverlay.Size = UDim2.new(1, 0, 1, 0)
+tapOverlay.BackgroundTransparency = 1
+tapOverlay.Visible = false
+tapOverlay.ZIndex = 1000
+tapOverlay.Active = true
+tapOverlay.Selectable = true
+
 local clickPoints = {}
 local indicators = {}
 local clicking = false
+local setPointsConnection
 
 local function clearPoints()
     for _, dot in pairs(indicators) do
@@ -254,30 +264,36 @@ local function clearPoints()
     clickPoints = {}
 end
 
--- Set points mode: listens for touches to add points with white dots
+local function createDotAtPos(pos)
+    local dot = Instance.new("Frame", gui)
+    dot.Size = UDim2.new(0, 12, 0, 12)
+    dot.Position = UDim2.new(0, pos.X - 6, 0, pos.Y - 6)
+    dot.BackgroundColor3 = Color3.new(1, 1, 1)
+    dot.BorderSizePixel = 0
+    dot.ZIndex = 9999
+    Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
+    return dot
+end
+
+-- Set Points Mode Toggle
 setBtn.MouseButton1Click:Connect(function()
-    setBtn.Text = "Tap to add points... (5 sec)"
-    -- Connect to mobile touch tap event
-    local conn
-    conn = UserInputService.TouchTap:Connect(function(touches, processed)
-        if processed then return end
-        local pos = touches[1]
-        if pos then
-            table.insert(clickPoints, pos)
-            local dot = Instance.new("Frame", gui)
-            dot.Size = UDim2.new(0, 12, 0, 12)
-            dot.Position = UDim2.new(0, pos.X - 6, 0, pos.Y - 6)
-            dot.BackgroundColor3 = Color3.new(1, 1, 1)
-            dot.BorderSizePixel = 0
-            dot.ZIndex = 999
-            Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
-            table.insert(indicators, dot)
-        end
-    end)
-    task.delay(5, function()
+    if setPointsConnection then
+        setPointsConnection:Disconnect()
+        setPointsConnection = nil
+        tapOverlay.Visible = false
         setBtn.Text = "Set Points (Tap Anywhere)"
-        if conn then
-            conn:Disconnect()
+        return
+    end
+
+    tapOverlay.Visible = true
+    setBtn.Text = "Tap points anywhere. Tap 'Set Points' again to stop."
+
+    setPointsConnection = tapOverlay.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local pos = input.Position
+            table.insert(clickPoints, pos)
+            local dot = createDotAtPos(pos)
+            table.insert(indicators, dot)
         end
     end)
 end)
@@ -286,37 +302,53 @@ clearBtn.MouseButton1Click:Connect(function()
     clearPoints()
 end)
 
-runBtn.MouseButton1Click:Connect(function()
-    if clicking then return end
-    if #clickPoints == 0 then return end
-    clicking = true
-    local delayTime = tonumber(delayBox.Text) or 1
+local clickCoroutine
 
-    spawn(function()
+runBtn.MouseButton1Click:Connect(function()
+    if clicking then
+        clicking = false
+        runBtn.Text = "Start Clicking"
+        return
+    end
+
+    if #clickPoints == 0 then
+        runBtn.Text = "Set at least 1 point!"
+        task.delay(2, function()
+            if not clicking then
+                runBtn.Text = "Start Clicking"
+            end
+        end)
+        return
+    end
+
+    clicking = true
+    runBtn.Text = "Stop Clicking"
+
+    local delayTime = tonumber(delayBox.Text) or 1
+    clickCoroutine = coroutine.create(function()
         while clicking do
             for _, pos in ipairs(clickPoints) do
-                -- On mobile, simulate touch tap at pos
-                local virtualInput = game:GetService("VirtualInputManager")
-                virtualInput:SendTouchEvent(true, pos, 0)
-                task.wait(0.05)
-                virtualInput:SendTouchEvent(false, pos, 0)
-                task.wait(delayTime)
                 if not clicking then break end
+                VirtualInputManager:SendTouchEvent(true, pos, 0)
+                task.wait(0.03)
+                VirtualInputManager:SendTouchEvent(false, pos, 0)
+                task.wait(delayTime)
             end
         end
     end)
-end)
-
--- Stop clicking if UI is closed or something (optional)
-closeBtn.MouseButton1Click:Connect(function()
-    clicking = false
-end)
-minBtn.MouseButton1Click:Connect(function()
-    clicking = false
+    coroutine.resume(clickCoroutine)
 end)
 
 minimize.MouseButton1Click:Connect(function()
     clickerUI.Visible = false
+    clicking = false
+    if setPointsConnection then
+        setPointsConnection:Disconnect()
+        setPointsConnection = nil
+    end
+    tapOverlay.Visible = false
+    runBtn.Text = "Start Clicking"
+    setBtn.Text = "Set Points (Tap Anywhere)"
 end)
 
 autoClickerBtn.MouseButton1Click:Connect(function()
