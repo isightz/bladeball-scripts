@@ -1,139 +1,210 @@
--- iSights Hypershot Utility
--- Made by iSight ZYX and Imran
-
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua"))()
-local ThemeManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/addons/SaveManager.lua"))()
-
-local Window = Library:CreateWindow({
-    Title = 'iSights Hypershot Utility',
-    Center = true,
-    AutoShow = true,
-    TabPadding = 8,
-    MenuFadeTime = 0.2
-})
-
--- Set the default theme
-Library:SetWatermark('iSights Hypershot Utility | Made by iSight ZYX and Imran')
-Library:OnUnload(function()
-    print('Unloaded!')
-    Library.Unloaded = true
-end)
-
--- Main tab
-local MainTab = Window:AddTab('Main')
-local AutoFarmSection = MainTab:AddLeftGroupbox('Auto Farm')
-
--- Auto Farm toggle
-local AutoFarmEnabled = false
-local AutoFarmButton = AutoFarmSection:AddButton('Auto Farm: OFF', function()
-    AutoFarmEnabled = not AutoFarmEnabled
-    
-    if AutoFarmEnabled then
-        AutoFarmButton:SetText('Auto Farm: ON')
-        loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
-    else
-        AutoFarmButton:SetText('Auto Farm: OFF')
-        -- Add code here to stop the auto farm if needed
-    end
-end)
-
--- Info tab
-local InfoTab = Window:AddTab('Info')
-local InfoSection = InfoTab:AddLeftGroupbox('About & Instructions')
-
-InfoSection:AddLabel('Made by iSight ZYX and Imran')
-InfoSection:AddLabel(' ')
-InfoSection:AddLabel('How to use:')
-InfoSection:AddLabel('1. Enable Auto Farm to automatically bring all players')
-InfoSection:AddLabel('2. You must have auto reload ability in first slot')
-InfoSection:AddLabel(' ')
-InfoSection:AddLabel('Script will auto-load Hypershot no cooldown')
-
--- Load the main script automatically
+-- Auto-execute main script on UI run
 loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-No-Ability-Cooldown-Open-Sourced-47339"))()
 
--- UI Customization
-Library:GiveSignal(function()
-    -- Set the theme to dark
-    ThemeManager:SetLibrary(Library)
-    SaveManager:SetLibrary(Library)
-    
-    SaveManager:IgnoreThemeSettings()
-    SaveManager:SetIgnoreIndexes({ 'MenuFadeTime' })
-    
-    ThemeManager:SetFolder('iSightsHypershot')
-    SaveManager:SetFolder('iSightsHypershot')
-    
-    ThemeManager:ApplyToTab(Window)
-    
-    -- Customize the UI appearance
-    Library.Background.Transparency = 0.7
-    Library.Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    Library.Main.Size = UDim2.new(0, 500, 0, 500)
-    
-    -- Make buttons animate on press
-    for _, tab in next, Window.Tabs do
-        for _, box in next, tab.Boxes do
-            for _, element in next, box.Elements do
-                if element.Instance:IsA('TextButton') then
-                    element.Instance.MouseButton1Down:Connect(function()
-                        element.Instance.BackgroundTransparency = 0.7
-                    end)
-                    
-                    element.Instance.MouseButton1Up:Connect(function()
-                        element.Instance.BackgroundTransparency = 0.85
-                    end)
-                    
-                    element.Instance.MouseLeave:Connect(function()
-                        element.Instance.BackgroundTransparency = 0.85
-                    end)
-                end
-            end
-        end
-    end
-end)
+-- Services
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 
--- Minimize functionality
-local minimized = false
-local originalSize = Library.Main.Size
-local minimizedSize = UDim2.new(0, 50, 0, 50)
+local player = Players.LocalPlayer
+local mouse = player:GetMouse()
 
-local minimizeButton = Instance.new("TextButton")
-minimizeButton.Text = "-"
-minimizeButton.Size = UDim2.new(0, 20, 0, 20)
-minimizeButton.Position = UDim2.new(1, -25, 0, 5)
-minimizeButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimizeButton.Font = Enum.Font.SourceSansBold
-minimizeButton.TextSize = 18
-minimizeButton.Parent = Library.Main
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "iSightsHypershotUtility"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ResetOnSpawn = false
 
-minimizeButton.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    
-    if minimized then
-        Library.Main.Size = minimizedSize
-        for _, tab in next, Window.Tabs do
-            tab.Container.Visible = false
-        end
-    else
-        Library.Main.Size = originalSize
-        for _, tab in next, Window.Tabs do
-            tab.Container.Visible = true
-        end
-    end
-end)
+-- Draggable Icon (for minimize)
+local Icon = Instance.new("TextButton")
+Icon.Name = "MiniIcon"
+Icon.Text = "📱"
+Icon.Size = UDim2.new(0, 40, 0, 40)
+Icon.Position = UDim2.new(0, 10, 0, 10)
+Icon.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Icon.TextColor3 = Color3.fromRGB(255, 255, 255)
+Icon.BackgroundTransparency = 0.3
+Icon.Visible = false
+Icon.Parent = ScreenGui
 
--- Mobile friendly adjustments
-if not is_sirhurt_closure and syn and syn.protect_gui then
-    syn.protect_gui(Library.Main)
+-- Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 400, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BackgroundTransparency = 0.2
+MainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.Parent = ScreenGui
+
+-- UICorner
+local UICorner = Instance.new("UICorner", MainFrame)
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Text = "iSights Hypershot Utility"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
+Title.Size = UDim2.new(1, -40, 0, 30)
+Title.Position = UDim2.new(0, 10, 0, 5)
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = MainFrame
+
+-- Minimize Button
+local Minimize = Instance.new("TextButton")
+Minimize.Text = "-"
+Minimize.Font = Enum.Font.GothamBold
+Minimize.TextSize = 18
+Minimize.Size = UDim2.new(0, 30, 0, 30)
+Minimize.Position = UDim2.new(1, -35, 0, 5)
+Minimize.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
+Minimize.Parent = MainFrame
+
+-- Tabs
+local Tabs = Instance.new("Frame")
+Tabs.Size = UDim2.new(0, 100, 1, -40)
+Tabs.Position = UDim2.new(0, 0, 0, 40)
+Tabs.BackgroundTransparency = 1
+Tabs.Parent = MainFrame
+
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1, -100, 1, -40)
+Content.Position = UDim2.new(0, 100, 0, 40)
+Content.BackgroundTransparency = 1
+Content.Parent = MainFrame
+
+-- Tab Buttons
+local function createTabButton(name)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(1, 0, 0, 40)
+    button.Text = name
+    button.Font = Enum.Font.Gotham
+    button.TextSize = 14
+    button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.AutoButtonColor = false
+    button.Parent = Tabs
+
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    end)
+    button.MouseLeave:Connect(function()
+        button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    end)
+
+    return button
 end
 
-Library.Main.AnchorPoint = Vector2.new(0.5, 0.5)
-Library.Main.Position = UDim2.new(0.5, 0, 0.5, 0)
-Library.Main.Active = true
-Library.Main.Draggable = true
+-- Pages
+local Pages = {}
 
--- Make UI more responsive for mobile
-Library.Main:TweenSize(UDim2.new(0, 350, 0, 450), 'Out', 'Quad', 0.4, true)
+-- Main Tab
+Pages.Main = Instance.new("Frame")
+Pages.Main.Size = UDim2.new(1, 0, 1, 0)
+Pages.Main.BackgroundTransparency = 1
+Pages.Main.Visible = true
+Pages.Main.Parent = Content
+
+local autoFarmToggle = false
+local AutoFarmButton = Instance.new("TextButton")
+AutoFarmButton.Text = "Auto Farm: OFF"
+AutoFarmButton.Size = UDim2.new(0, 200, 0, 40)
+AutoFarmButton.Position = UDim2.new(0, 20, 0, 20)
+AutoFarmButton.Font = Enum.Font.Gotham
+AutoFarmButton.TextSize = 14
+AutoFarmButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+AutoFarmButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+AutoFarmButton.Parent = Pages.Main
+
+AutoFarmButton.MouseButton1Click:Connect(function()
+    autoFarmToggle = not autoFarmToggle
+    if autoFarmToggle then
+        AutoFarmButton.Text = "Auto Farm: ON"
+        loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
+    else
+        AutoFarmButton.Text = "Auto Farm: OFF"
+        -- Optional: You can add logic to pause/stop script here
+    end
+end)
+
+-- Info Tab
+Pages.Info = Instance.new("Frame")
+Pages.Info.Size = UDim2.new(1, 0, 1, 0)
+Pages.Info.BackgroundTransparency = 1
+Pages.Info.Visible = false
+Pages.Info.Parent = Content
+
+local InfoLabel = Instance.new("TextLabel")
+InfoLabel.Size = UDim2.new(1, -20, 1, -20)
+InfoLabel.Position = UDim2.new(0, 10, 0, 10)
+InfoLabel.BackgroundTransparency = 1
+InfoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+InfoLabel.Font = Enum.Font.Gotham
+InfoLabel.TextWrapped = true
+InfoLabel.TextXAlignment = Enum.TextXAlignment.Left
+InfoLabel.TextYAlignment = Enum.TextYAlignment.Top
+InfoLabel.TextSize = 14
+InfoLabel.Text = [[
+Made by iSight, ZYX & Imran
+
+Usage:
+- Use the "Auto Farm" button on the Main tab.
+- Make sure you have the "Auto Reload" ability on your first slot.
+- Auto script loads when you open the UI.
+]]
+InfoLabel.Parent = Pages.Info
+
+-- Create and switch tabs
+local buttons = {
+    Main = createTabButton("Main"),
+    Info = createTabButton("Info")
+}
+
+local tabList = {"Main", "Info"}
+
+for i, tabName in ipairs(tabList) do
+    buttons[tabName].Position = UDim2.new(0, 0, 0, (i - 1) * 40)
+    buttons[tabName].MouseButton1Click:Connect(function()
+        for name, page in pairs(Pages) do
+            page.Visible = (name == tabName)
+        end
+    end)
+end
+
+-- Hide / Show Logic
+Minimize.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    Icon.Visible = true
+end)
+
+Icon.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    Icon.Visible = false
+end)
+
+-- Draggable Mini Icon
+local dragging = false
+local dragInput, dragStart, startPos
+
+Icon.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = Icon.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Icon.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        Icon.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                  startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
