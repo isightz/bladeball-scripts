@@ -1,16 +1,15 @@
+-- iSights Hypershot Utility (Perfect Clone)  
+-- Made by Isight Zyx and Imran  
+-- Auto‑load cooldown bypass / Auto Farm Utility
 
--- iSights Hypershot Utility UI Clone (Aether Style)
--- Made by Isight Zyx + Imran
+local CoreGui       = game:GetService("CoreGui")
+local TweenService  = game:GetService("TweenService")
+local RunService    = game:GetService("RunService")
 
--- Load cooldown bypass on launch
+-- Load bypass first
 loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-No-Ability-Cooldown-Open-Sourced-47339"))()
 
-local CoreGui = game:GetService("CoreGui")
-local TweenService = game:GetService("TweenService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
-local RunService = game:GetService("RunService")
-
--- GUI container
+-- Create ScreenGui
 local gui = Instance.new("ScreenGui")
 gui.Name = "iSightsHypershotUtility"
 gui.ResetOnSpawn = false
@@ -18,183 +17,167 @@ gui.Parent = CoreGui
 
 -- Main window
 local main = Instance.new("Frame")
-main.Size = UDim2.new(0, 640, 0, 420)
-main.Position = UDim2.new(0.5, -320, 0.5, -210)
-main.BackgroundColor3 = Color3.fromRGB(25, 20, 40)
-main.BackgroundTransparency = 0.3
+main.Name = "MainWindow"
+main.Size = UDim2.new(0, 520, 0, 360)
+main.Position = UDim2.new(0.5, -260, 0.5, -180)
+main.BackgroundColor3 = Color3.fromRGB(30, 28, 50)
 main.BorderSizePixel = 0
 main.Active = true
 main.Draggable = true
 main.Parent = gui
+Instance.new("UICorner", main).CornerRadius = UDim.new(0,12)
 
-Instance.new("UICorner", main).CornerRadius = UDim.new(0, 8)
+-- Gradient background
+local gradient = Instance.new("UIGradient", main)
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 45, 110)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 25, 75))
+}
+gradient.Rotation = 90
 
+-- Border stroke
 local stroke = Instance.new("UIStroke", main)
-stroke.Thickness = 1.5
-stroke.Color = Color3.fromRGB(80, 70, 120)
+stroke.Color = Color3.fromRGB(85, 75, 140)
+stroke.Thickness = 2
 
--- Title bar
+-- Title label
 local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1, -80, 0, 40)
-title.Position = UDim2.new(0, 10, 0, 0)
-title.Text = "iSights Hypershot Utility"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 20
+title.Size = UDim2.new(1, 0, 0, 50)
+title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundTransparency = 1
-title.TextXAlignment = Enum.TextXAlignment.Left
+title.Text = "iSights Hypershot Utility"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 24
+title.TextColor3 = Color3.new(1,1,1)
+title.TextYAlignment = Enum.TextYAlignment.Center
 
 -- Close button
 local closeBtn = Instance.new("TextButton", main)
-closeBtn.Size = UDim2.new(0, 40, 0, 40)
-closeBtn.Position = UDim2.new(1, -50, 0, 0)
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 10)
 closeBtn.Text = "X"
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.TextSize = 18
 closeBtn.TextColor3 = Color3.fromRGB(255, 90, 90)
-closeBtn.BackgroundTransparency = 1
+closeBtn.BackgroundColor3 = Color3.fromRGB(55, 45, 80)
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(1,0)
 
 closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
-    if _G.AutoFarmConnection then _G.AutoFarmConnection:Disconnect() end
+    if _G.AutoFarmConnection then
+        _G.AutoFarmConnection:Disconnect()
+    end
     _G.RunAutoFarm = false
-    _G.AutoClick = false
 end)
 
--- Left nav bar
-local nav = Instance.new("Frame", main)
-nav.Size = UDim2.new(0, 140, 1, -40)
-nav.Position = UDim2.new(0, 0, 0, 40)
-nav.BackgroundColor3 = Color3.fromRGB(30, 26, 50)
-nav.BorderSizePixel = 0
-Instance.new("UICorner", nav).CornerRadius = UDim.new(0, 8)
+-- Tab panel
+local tabPanel = Instance.new("Frame", main)
+tabPanel.Size = UDim2.new(0, 150, 1, -60)
+tabPanel.Position = UDim2.new(0, 0, 0, 60)
+tabPanel.BackgroundColor3 = Color3.fromRGB(26, 24, 44)
+tabPanel.BorderSizePixel = 0
+Instance.new("UICorner", tabPanel).CornerRadius = UDim.new(0,8)
 
 -- Pages container
 local pages = {}
-local tabList = {
-    {Name = "Info"},
-    {Name = "Main"},
-}
 
-for i, tab in ipairs(tabList) do
-    local btn = Instance.new("TextButton", nav)
+-- Tab definitions
+local tabNames = {"Info", "Main"}
+for idx, name in ipairs(tabNames) do
+    -- Button
+    local btn = Instance.new("TextButton", tabPanel)
+    btn.Name = "TabBtn_"..name
     btn.Size = UDim2.new(1, 0, 0, 40)
-    btn.Position = UDim2.new(0, 0, 0, (i - 1) * 42)
-    btn.BackgroundColor3 = Color3.fromRGB(40, 35, 65)
-    btn.Text = tab.Name
-    btn.Font = Enum.Font.Gotham
+    btn.Position = UDim2.new(0, 0, 0, (idx-1)*40)
+    btn.Text = name
+    btn.Font = Enum.Font.GothamBold
     btn.TextSize = 16
-    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 35, 65)
     btn.BorderSizePixel = 0
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
-
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+    
+    -- Content page
     local page = Instance.new("Frame", main)
-    page.Name = "Page_" .. tab.Name
-    page.Size = UDim2.new(1, -150, 1, -50)
-    page.Position = UDim2.new(0, 150, 0, 50)
+    page.Name = "Page_"..name
+    page.Size = UDim2.new(1, -150, 1, -60)
+    page.Position = UDim2.new(0, 150, 0, 60)
     page.BackgroundTransparency = 1
-    page.Visible = (i == 1)
-    pages[tab.Name] = page
-
+    page.Visible = (idx == 1)
+    pages[name] = page
+    
     btn.MouseButton1Click:Connect(function()
         for _, p in pairs(pages) do p.Visible = false end
         page.Visible = true
     end)
 end
 
--- INFO PAGE
-local info = Instance.new("TextLabel", pages.Info)
-info.Size = UDim2.new(1, -20, 1, -20)
-info.Position = UDim2.new(0, 10, 0, 10)
-info.Text = [[
+-- Info page content
+local infoLabel = Instance.new("TextLabel", pages.Info)
+infoLabel.Size = UDim2.new(1, -20, 1, -20)
+infoLabel.Position = UDim2.new(0, 10, 0, 10)
+infoLabel.BackgroundTransparency = 1
+infoLabel.TextWrapped = true
+infoLabel.TextXAlignment = Enum.TextXAlignment.Left
+infoLabel.TextYAlignment = Enum.TextYAlignment.Top
+infoLabel.Font = Enum.Font.Gotham
+infoLabel.TextSize = 18
+infoLabel.TextColor3 = Color3.new(1,1,1)
+infoLabel.Text = [[
 Made by Isight Zyx and Imran
 
-Instructions:
-- Ability Slot 1 must be "Auto Reload"
-- AutoFarm is always ON by default
-- Use Auto Clicker button to simulate clicks
+How to use:
+• Go to “Main” tab
+• Toggle Auto Farm ON to start
+• Ability “Auto Reload” must be in slot 1
+• Toggle OFF terminates the script
 ]]
-info.Font = Enum.Font.Gotham
-info.TextSize = 16
-info.TextColor3 = Color3.new(1, 1, 1)
-info.TextWrapped = true
-info.TextXAlignment = Enum.TextXAlignment.Left
-info.TextYAlignment = Enum.TextYAlignment.Top
-info.BackgroundTransparency = 1
 
--- MAIN PAGE
-local clickBtn = Instance.new("TextButton", pages.Main)
-clickBtn.Size = UDim2.new(0, 280, 0, 60)
-clickBtn.Position = UDim2.new(0.5, -140, 0.3, 0)
-clickBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
-clickBtn.Text = "Auto Clicker: OFF"
-clickBtn.Font = Enum.Font.GothamBold
-clickBtn.TextSize = 20
-clickBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", clickBtn).CornerRadius = UDim.new(0, 10)
+-- Main page content
+local farmBtn = Instance.new("TextButton", pages.Main)
+farmBtn.Name = "FarmToggle"
+farmBtn.Size = UDim2.new(0, 240, 0, 60)
+farmBtn.Position = UDim2.new(0.5, -120, 0.3, 0)
+farmBtn.Text = "Auto Farm: OFF"
+farmBtn.Font = Enum.Font.GothamBold
+farmBtn.TextSize = 20
+farmBtn.TextColor3 = Color3.new(1,1,1)
+farmBtn.BackgroundColor3 = Color3.fromRGB(60,50,100)
+Instance.new("UICorner", farmBtn).CornerRadius = UDim.new(0,10)
 
--- AutoFarm always on
-_G.RunAutoFarm = true
-loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
-
--- Auto Clicker logic
-_G.AutoClick = false
-
-local function simulateTap(x, y)
-    VirtualInputManager:SendTouchEvent(Enum.UserInputType.Touch, Vector2.new(x, y), "Begin", game)
-    VirtualInputManager:SendTouchEvent(Enum.UserInputType.Touch, Vector2.new(x, y), "End", game)
+-- Logic
+local function stopFarm()
+    if _G.AutoFarmConnection then
+        _G.AutoFarmConnection:Disconnect()
+        _G.AutoFarmConnection = nil
+    end
+    _G.RunAutoFarm = false
+    farmBtn.Text = "Auto Farm: OFF"
+    farmBtn.BackgroundColor3 = Color3.fromRGB(60,50,100)
 end
 
-local function startClicking()
-    spawn(function()
-        while _G.AutoClick do
-            -- Start button and adjacent ability button (bottom-center region)
-            simulateTap(340, 630)  -- Estimated left button position
-            simulateTap(460, 630)  -- Estimated center button position
-            wait(3)
-        end
-    end)
+local function startFarm()
+    _G.RunAutoFarm = true
+    farmBtn.Text = "Auto Farm: ON"
+    farmBtn.BackgroundColor3 = Color3.fromRGB(70,120,70)
+    -- launch auto‑farm script
+    local s = loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))
+    s()
+    -- optionally track its connection if needed
+    -- example: _G.AutoFarmConnection = someConnection
 end
 
-clickBtn.MouseButton1Click:Connect(function()
-    _G.AutoClick = not _G.AutoClick
-    clickBtn.Text = "Auto Clicker: " .. (_G.AutoClick and "ON" or "OFF")
-    clickBtn.BackgroundColor3 = _G.AutoClick and Color3.fromRGB(80, 120, 80) or Color3.fromRGB(60, 50, 100)
-    if _G.AutoClick then
-        startClicking()
+farmBtn.MouseButton1Click:Connect(function()
+    if _G.RunAutoFarm then
+        stopFarm()
+    else
+        startFarm()
     end
 end)
 
-
-
--- Auto Clicker Logic (Clicks two specific screen spots every 3 seconds)
-local UserInputService = game:GetService("UserInputService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
-local RunService = game:GetService("RunService")
-
-local phoneScale = workspace.CurrentCamera.ViewportSize
-local iPhone14ScaleX, iPhone14ScaleY = 1170, 2532 -- iPhone 14 screen resolution (points)
-local scaleX = phoneScale.X / iPhone14ScaleX
-local scaleY = phoneScale.Y / iPhone14ScaleY
-
-local clickPoints = {
-    Vector2.new(260, 2090), -- Spot 1
-    Vector2.new(460, 2090)  -- Spot 2
-}
-
--- Convert and click function
-local function clickAt(position)
-    local scaledPos = Vector2.new(position.X * scaleX, position.Y * scaleY)
-    VirtualInputManager:SendMouseButtonEvent(scaledPos.X, scaledPos.Y, 0, true, game, 0)
-    VirtualInputManager:SendMouseButtonEvent(scaledPos.X, scaledPos.Y, 0, false, game, 0)
-end
-
--- Start auto clicking loop
-task.spawn(function()
-    while true do
-        for _, pos in ipairs(clickPoints) do
-            clickAt(pos)
-        end
-        task.wait(3)
+-- Allow dragging when clicking title
+title.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        main:CaptureFocus()
     end
 end)
