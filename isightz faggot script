@@ -1,134 +1,190 @@
--- iSights Hypershot Utility UI by Zyx & Imran
+-- iSights Hypershot Utility (Perfect Clone)
+-- Made by iSight Zyx and Imran
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
-
-local OrionLib = OrionLib or shared.OrionLib
-local Window = OrionLib:MakeWindow({
-	Name = "iSights Hypershot Utility",
-	HidePremium = false,
-	SaveConfig = false,
-	IntroText = "iSights Zyx & Imran",
-	ConfigFolder = "iSightConfig"
-})
-
--- Auto Farm Toggle
-local autoFarmOn = false
-
-Window:MakeTab({
-	Name = "Main",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-}):AddButton({
-	Name = "Toggle Auto Farm",
-	Callback = function()
-		autoFarmOn = not autoFarmOn
-		if autoFarmOn then
-			getgenv().AFARM = true
-			loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
-			OrionLib:MakeNotification({
-				Name = "Auto Farm",
-				Content = "Auto Farm Activated",
-				Time = 3
-			})
-		else
-			getgenv().AFARM = false
-			OrionLib:MakeNotification({
-				Name = "Auto Farm",
-				Content = "Stopped. Reset to fully unload.",
-				Time = 3
-			})
-		end
-	end
-})
-
--- Auto Clicker
-local clickPoints = {}
-local clickDelay = 0.5
-local clickCount = 10
-local clickerEnabled = false
-local clickerPaused = false
-
-local VirtualInputManager = game:GetService("VirtualInputManager")
+local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
 
-local function startClicker()
-	clickerEnabled = true
-	clickerPaused = false
-	task.spawn(function()
-		while clickerEnabled and not clickerPaused do
-			for i = 1, clickCount do
-				if not clickerEnabled or clickerPaused then break end
-				for _, point in ipairs(clickPoints) do
-					VirtualInputManager:SendMouseButtonEvent(point.X, point.Y, 0, true, game, 0)
-					VirtualInputManager:SendMouseButtonEvent(point.X, point.Y, 0, false, game, 0)
-					task.wait(clickDelay)
-				end
-			end
-		end
-	end)
+-- UI Elements
+local gui = Instance.new("ScreenGui", CoreGui)
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 520, 0, 320)
+main.Position = UDim2.new(0.5, -260, 0.5, -160)
+main.BackgroundColor3 = Color3.fromRGB(34, 32, 52)
+main.BackgroundTransparency = 0.15
+main.Active = true
+main.Draggable = true
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
+
+-- Title bar with X and minimize
+local title = Instance.new("TextLabel", main)
+title.Text = "iSights Hypershot Utility"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.TextColor3 = Color3.new(1,1,1)
+title.BackgroundTransparency = 1
+title.Size = UDim2.new(1, -70, 0, 30)
+title.Position = UDim2.new(0, 10, 0, 5)
+
+local closeBtn = Instance.new("TextButton", main)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 18
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(1,0)
+closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+local minBtn = Instance.new("TextButton", main)
+minBtn.Position = UDim2.new(1, -70, 0, 5)
+minBtn.Size = UDim2.new(0, 30, 0, 30)
+minBtn.Text = "–"
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 18
+Instance.new("UICorner", minBtn).CornerRadius = UDim.new(1,0)
+
+local miniIcon = Instance.new("TextButton", gui)
+miniIcon.Size = UDim2.new(0, 50, 0, 50)
+miniIcon.Position = UDim2.new(0.05, 0, 0.8, 0)
+miniIcon.Text = "i"
+miniIcon.Font = Enum.Font.GothamBold
+miniIcon.TextSize = 24
+miniIcon.Visible = false
+miniIcon.Active = true
+miniIcon.Draggable = true
+Instance.new("UICorner", miniIcon).CornerRadius = UDim.new(1, 0)
+
+minBtn.MouseButton1Click:Connect(function()
+    main.Visible = false
+    miniIcon.Visible = true
+end)
+miniIcon.MouseButton1Click:Connect(function()
+    main.Visible = true
+    miniIcon.Visible = false
+end)
+
+-- Tabs
+local tabFrame = Instance.new("Frame", main)
+tabFrame.Size = UDim2.new(0, 140, 1, -40)
+tabFrame.Position = UDim2.new(0, 0, 0, 40)
+Instance.new("UICorner", tabFrame).CornerRadius = UDim.new(0,6)
+
+local pages = {}
+for i,name in ipairs({"INFO","MAIN","CLICKER"}) do
+    local btn = Instance.new("TextButton", tabFrame)
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, (i-1)*40)
+    btn.Text = name
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.BackgroundColor3 = Color3.fromRGB(32,30,50)
+    btn.AutoButtonColor = true
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+
+    local page = Instance.new("Frame", main)
+    page.Name = "Page_"..name
+    page.Size = UDim2.new(1, -140, 1, -40)
+    page.Position = UDim2.new(0, 140, 0, 40)
+    page.BackgroundTransparency = 1
+    pages[name] = page
+
+    btn.MouseButton1Click:Connect(function()
+        for _,p in pairs(pages) do p.Visible = false end
+        page.Visible = true
+    end)
 end
+pages["INFO"].Visible=true
 
-local Tab = Window:MakeTab({
-	Name = "Auto Clicker",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
+-- Info page
+local info = pages["INFO"]
+local infoLbl = Instance.new("TextLabel", info)
+infoLbl.Size = UDim2.new(1, -20, 1, -20)
+infoLbl.Position = UDim2.new(0,10,0,10)
+infoLbl.Text = "Made by iSight Zyx and Imran\n\nHow to Use:\n- Auto Farm ON in Main\n- Auto Reload in Slot 1"
+infoLbl.Font = Enum.Font.Gotham
+infoLbl.TextSize = 16
+infoLbl.TextXAlignment = Enum.TextXAlignment.Left
+infoLbl.BackgroundTransparency = 1
+infoLbl.TextColor3 = Color3.new(1,1,1)
 
-Tab:AddButton({
-	Name = "Add Click Point",
-	Callback = function()
-		local pos = UserInputService:GetMouseLocation()
-		table.insert(clickPoints, pos)
-		OrionLib:MakeNotification({Name = "Clicker", Content = "Added Point", Time = 2})
-	end
-})
+-- Auto Farm page
+local farm = pages["MAIN"]
+local farmBtn = Instance.new("TextButton", farm)
+farmBtn.Size = UDim2.new(0,200,0,50)
+farmBtn.Position = UDim2.new(0.5, -100, 0.3, 0)
+farmBtn.Text = "AUTO FARM: OFF"
+farmBtn.Font = Enum.Font.GothamBold
+farmBtn.TextSize = 18
+farmBtn.BackgroundColor3 = Color3.fromRGB(60,50,100)
+Instance.new("UICorner", farmBtn).CornerRadius = UDim.new(0,6)
 
-Tab:AddTextbox({
-	Name = "Click Delay (sec)",
-	Default = "0.5",
-	TextDisappear = false,
-	Callback = function(text)
-		clickDelay = tonumber(text) or 0.5
-	end
-})
+local farmRunning = false
+local farmScript
 
-Tab:AddTextbox({
-	Name = "Click Count",
-	Default = "10",
-	TextDisappear = false,
-	Callback = function(text)
-		clickCount = tonumber(text) or 10
-	end
-})
+farmBtn.MouseButton1Click:Connect(function()
+    if farmRunning then
+        if farmScript then farmScript:Destroy() end
+        farmRunning = false
+        farmBtn.Text = "AUTO FARM: OFF"
+    else
+        farmScript = Instance.new("LocalScript", gui)
+        farmScript.Source = "loadstring(game:HttpGet('https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412'))()"
+        farmRunning = true
+        farmBtn.Text = "AUTO FARM: ON"
+    end
+end)
 
-Tab:AddButton({
-	Name = "Start Clicker",
-	Callback = function()
-		startClicker()
-	end
-})
+-- Auto Clicker page
+local clicker = pages["CLICKER"]
+local clickPoints, delayTime, clickAmt = {}, .5, 10
+local clickEnabled, clickPaused = false, false
 
-Tab:AddButton({
-	Name = "Pause / Resume Clicker",
-	Callback = function()
-		clickerPaused = not clickerPaused
-	end
-})
+local addBtn = Instance.new("TextButton", clicker)
+addBtn.Text = "Add Click Point"
+addBtn.Size = UDim2.new(0,200,0,40)
+addBtn.Position = UDim2.new(0.05, 0, 0.05, 0)
+Instance.new("UICorner", addBtn).CornerRadius = UDim.new(0,6)
+addBtn.MouseButton1Click:Connect(function()
+    local pos = UserInputService:GetMouseLocation()
+    table.insert(clickPoints, Vector2.new(pos.X, pos.Y))
+end)
 
-Tab:AddButton({
-	Name = "Stop Clicker",
-	Callback = function()
-		clickerEnabled = false
-		clickPoints = {}
-	end
-})
+local startBtn = Instance.new("TextButton", clicker)
+startBtn.Text = "Start Clicker"
+startBtn.Size = UDim2.new(0,200,0,40)
+startBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
+Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0,6)
+startBtn.MouseButton1Click:Connect(function()
+    clickEnabled = true
+    clickPaused = false
+    task.spawn(function()
+        while clickEnabled do
+            if not clickPaused then
+                for _,pt in ipairs(clickPoints) do
+                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, true, game, 0)
+                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, false, game, 0)
+                    task.wait(delayTime)
+                    if not clickEnabled then break end
+                end
+            end
+            task.wait()
+        end
+    end)
+end)
 
--- Info Tab
-Window:MakeTab({
-	Name = "Info",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-}):AddParagraph("iSight Utility", "Made by Zyx & Imran\n\nHow to Use:\n- Enable Auto Farm\n- Ensure Auto Reload is equipped in Slot 1")
+local pauseBtn = startBtn:Clone()
+pauseBtn.Parent = clicker
+pauseBtn.Position = UDim2.new(0.05,0,0.25,0)
+pauseBtn.Text = "Pause/Resume"
+pauseBtn.MouseButton1Click:Connect(function()
+    clickPaused = not clickPaused
+end)
 
--- Done
-OrionLib:Init()
+local stopBtn = startBtn:Clone()
+stopBtn.Parent = clicker
+stopBtn.Position = UDim2.new(0.05,0,0.35,0)
+stopBtn.Text = "Stop Clicker"
+stopBtn.MouseButton1Click:Connect(function()
+    clickEnabled = false
+    clickPoints = {}
+end)
