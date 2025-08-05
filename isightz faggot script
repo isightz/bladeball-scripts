@@ -14,16 +14,175 @@ gui.Name = "iSightsHypershotUtility"
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.ResetOnSpawn = false
 
--- UI setup same as before (Frames, Tab, Info, Main)...
--- [UI creation up to autoFarmBtn -- unchanged, already in your code above]
+-- Main Frame
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 520, 0, 320)
+main.Position = UDim2.new(0.5, -260, 0.5, -160)
+main.BackgroundColor3 = Color3.fromRGB(34, 32, 52)
+main.BackgroundTransparency = 0.15
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
+main.Parent = gui
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
 
--- AUTO CLICKER BUTTON
+local gradient = Instance.new("UIGradient", main)
+gradient.Color = ColorSequence.new {
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(65, 55, 120)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 30, 80))
+}
+gradient.Rotation = 90
+
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(90, 80, 150)
+stroke.Thickness = 2
+
+-- Close / Minimize / Reopen Buttons
+local closeBtn = Instance.new("TextButton", main)
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 16
+closeBtn.TextColor3 = Color3.fromRGB(255, 90, 90)
+closeBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(1, 0)
+
+local minBtn = Instance.new("TextButton", main)
+minBtn.Size = UDim2.new(0, 30, 0, 30)
+minBtn.Position = UDim2.new(0.5, -15, 0, -15)
+minBtn.Text = "-"
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 16
+minBtn.TextColor3 = Color3.new(1, 1, 1)
+minBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
+Instance.new("UICorner", minBtn).CornerRadius = UDim.new(1, 0)
+
+local miniIcon = Instance.new("TextButton", gui)
+miniIcon.Size = UDim2.new(0, 50, 0, 50)
+miniIcon.Position = UDim2.new(0.1, 0, 0.8, 0)
+miniIcon.Text = "📱"
+miniIcon.Visible = false
+miniIcon.Font = Enum.Font.GothamBold
+miniIcon.TextSize = 24
+miniIcon.TextColor3 = Color3.new(1, 1, 1)
+miniIcon.BackgroundColor3 = Color3.fromRGB(80, 60, 130)
+miniIcon.Active = true
+miniIcon.Draggable = true
+Instance.new("UICorner", miniIcon).CornerRadius = UDim.new(1, 0)
+
+closeBtn.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+minBtn.MouseButton1Click:Connect(function()
+    main.Visible = false
+    miniIcon.Visible = true
+end)
+miniIcon.MouseButton1Click:Connect(function()
+    main.Visible = true
+    miniIcon.Visible = false
+end)
+
+-- Tabs
+local tabFrame = Instance.new("Frame", main)
+tabFrame.Size = UDim2.new(0, 140, 1, 0)
+tabFrame.BackgroundColor3 = Color3.fromRGB(28, 26, 46)
+tabFrame.BorderSizePixel = 0
+Instance.new("UICorner", tabFrame).CornerRadius = UDim.new(0, 8)
+
+local tabList = {"📄 Info", "⚙️ Main"}
+local pages = {}
+
+for i, tabName in ipairs(tabList) do
+    local btn = Instance.new("TextButton", tabFrame)
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
+    btn.Text = tabName
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.BackgroundColor3 = Color3.fromRGB(32, 30, 50)
+    btn.BorderSizePixel = 0
+    btn.AutoButtonColor = false
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+
+    local page = Instance.new("Frame", main)
+    page.Name = "Page_" .. tabName
+    page.Visible = (i == 1)
+    page.Position = UDim2.new(0, 140, 0, 0)
+    page.Size = UDim2.new(1, -140, 1, 0)
+    page.BackgroundTransparency = 1
+    pages[tabName] = page
+
+    btn.MouseButton1Click:Connect(function()
+        for _, p in pairs(pages) do
+            p.Visible = false
+        end
+        page.Visible = true
+    end)
+end
+
+-- Info Tab
+local infoLabel = Instance.new("TextLabel", pages["📄 Info"])
+infoLabel.Size = UDim2.new(1, -20, 1, -20)
+infoLabel.Position = UDim2.new(0, 10, 0, 10)
+infoLabel.TextWrapped = true
+infoLabel.TextXAlignment = Enum.TextXAlignment.Left
+infoLabel.TextYAlignment = Enum.TextYAlignment.Top
+infoLabel.Font = Enum.Font.Gotham
+infoLabel.TextSize = 15
+infoLabel.TextColor3 = Color3.new(1, 1, 1)
+infoLabel.BackgroundTransparency = 1
+infoLabel.Text = "Made by Isight Zyx and Imran\n\nHow to use:\n- Use Auto Farm button in Main Tab\n- You MUST have Auto Reload Ability in Slot 1"
+
+-- Main Tab Buttons
+
+-- Auto Farm Button
+local autoFarmBtn = Instance.new("TextButton", pages["⚙️ Main"])
+autoFarmBtn.Size = UDim2.new(0, 200, 0, 50)
+autoFarmBtn.Position = UDim2.new(0.5, -100, 0.3, 0)
+autoFarmBtn.Text = "Auto Farm: OFF"
+autoFarmBtn.Font = Enum.Font.GothamBold
+autoFarmBtn.TextSize = 15
+autoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
+Instance.new("UICorner", autoFarmBtn).CornerRadius = UDim.new(0, 6)
+
+local autoFarmThread = nil
+
+local function stopFarm()
+    if autoFarmThread then
+        autoFarmThread:Disconnect()
+        autoFarmThread = nil
+    end
+    _G.RunAutoFarm = false
+end
+
+local function startFarm()
+    _G.RunAutoFarm = true
+    local s = loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))
+    s()
+end
+
+autoFarmBtn.MouseButton1Click:Connect(function()
+    if _G.RunAutoFarm then
+        stopFarm()
+        autoFarmBtn.Text = "Auto Farm: OFF"
+        autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
+    else
+        startFarm()
+        autoFarmBtn.Text = "Auto Farm: ON"
+        autoFarmBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
+    end
+end)
+
+-- Auto Clicker Button (clone of Auto Farm Btn)
 local autoClickerBtn = autoFarmBtn:Clone()
 autoClickerBtn.Text = "Auto Clicker"
 autoClickerBtn.Position = UDim2.new(0.5, -100, 0.55, 0)
 autoClickerBtn.Parent = pages["⚙️ Main"]
 
--- AUTO CLICKER POP-UP UI
+-- Auto Clicker UI Popup
 local clickerUI = Instance.new("Frame", gui)
 clickerUI.Size = UDim2.new(0, 300, 0, 260)
 clickerUI.Position = UDim2.new(0.5, -150, 0.5, -130)
@@ -37,7 +196,7 @@ local title = Instance.new("TextLabel", clickerUI)
 title.Size = UDim2.new(1, 0, 0, 30)
 title.Text = "Auto Clicker"
 title.BackgroundTransparency = 1
-title.TextColor3 = Color3.fromRGB(255,255,255)
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
 
@@ -55,19 +214,18 @@ local delayBox = Instance.new("TextBox", clickerUI)
 delayBox.Size = UDim2.new(0, 260, 0, 30)
 delayBox.Position = UDim2.new(0, 20, 0, 50)
 delayBox.PlaceholderText = "Click Delay (seconds)"
-delayBox.TextColor3 = Color3.new(1,1,1)
+delayBox.TextColor3 = Color3.new(1, 1, 1)
 delayBox.BackgroundColor3 = Color3.fromRGB(40, 40, 80)
 delayBox.Font = Enum.Font.Gotham
 delayBox.TextSize = 14
 Instance.new("UICorner", delayBox).CornerRadius = UDim.new(0, 6)
 
--- Buttons
 local setBtn = Instance.new("TextButton", clickerUI)
 setBtn.Size = UDim2.new(0, 260, 0, 30)
 setBtn.Position = UDim2.new(0, 20, 0, 90)
 setBtn.Text = "Set Points (Tap Anywhere)"
 setBtn.Font = Enum.Font.Gotham
-setBtn.TextColor3 = Color3.new(1,1,1)
+setBtn.TextColor3 = Color3.new(1, 1, 1)
 setBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 100)
 Instance.new("UICorner", setBtn).CornerRadius = UDim.new(0, 6)
 
@@ -83,52 +241,78 @@ runBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
 runBtn.Font = Enum.Font.GothamBold
 runBtn.Parent = clickerUI
 
--- Point logic
+-- Variables for points and indicators
 local clickPoints = {}
 local indicators = {}
+local clicking = false
 
 local function clearPoints()
-    for _, v in pairs(indicators) do v:Destroy() end
-    clickPoints = {}
+    for _, dot in pairs(indicators) do
+        dot:Destroy()
+    end
     indicators = {}
+    clickPoints = {}
 end
 
+-- Set points mode: listens for touches to add points with white dots
 setBtn.MouseButton1Click:Connect(function()
-    setBtn.Text = "Tap to add points..."
+    setBtn.Text = "Tap to add points... (5 sec)"
+    -- Connect to mobile touch tap event
     local conn
-    conn = UserInputService.TouchTap:Connect(function(pos, gameProcessed)
-        if gameProcessed then return end
-        table.insert(clickPoints, pos[1])
-        local dot = Instance.new("Frame", gui)
-        dot.Size = UDim2.new(0, 10, 0, 10)
-        dot.Position = UDim2.new(0, pos[1].X - 5, 0, pos[1].Y - 5)
-        dot.BackgroundColor3 = Color3.new(1, 1, 1)
-        dot.BorderSizePixel = 0
-        dot.ZIndex = 999
-        Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
-        table.insert(indicators, dot)
+    conn = UserInputService.TouchTap:Connect(function(touches, processed)
+        if processed then return end
+        local pos = touches[1]
+        if pos then
+            table.insert(clickPoints, pos)
+            local dot = Instance.new("Frame", gui)
+            dot.Size = UDim2.new(0, 12, 0, 12)
+            dot.Position = UDim2.new(0, pos.X - 6, 0, pos.Y - 6)
+            dot.BackgroundColor3 = Color3.new(1, 1, 1)
+            dot.BorderSizePixel = 0
+            dot.ZIndex = 999
+            Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
+            table.insert(indicators, dot)
+        end
     end)
-    task.wait(5)
-    setBtn.Text = "Set Points (Tap Anywhere)"
-    conn:Disconnect()
+    task.delay(5, function()
+        setBtn.Text = "Set Points (Tap Anywhere)"
+        if conn then
+            conn:Disconnect()
+        end
+    end)
 end)
 
-clearBtn.MouseButton1Click:Connect(clearPoints)
+clearBtn.MouseButton1Click:Connect(function()
+    clearPoints()
+end)
 
 runBtn.MouseButton1Click:Connect(function()
-    local delay = tonumber(delayBox.Text) or 1
+    if clicking then return end
+    if #clickPoints == 0 then return end
+    clicking = true
+    local delayTime = tonumber(delayBox.Text) or 1
+
     spawn(function()
-        while true do
+        while clicking do
             for _, pos in ipairs(clickPoints) do
-                local touch = Instance.new("BindableEvent")
-                touch.Event:Connect(function() end)
-                game:GetService("VirtualInputManager"):SendTouchEvent(true, pos, 0)
+                -- On mobile, simulate touch tap at pos
+                local virtualInput = game:GetService("VirtualInputManager")
+                virtualInput:SendTouchEvent(true, pos, 0)
                 task.wait(0.05)
-                game:GetService("VirtualInputManager"):SendTouchEvent(false, pos, 0)
-                task.wait(delay)
+                virtualInput:SendTouchEvent(false, pos, 0)
+                task.wait(delayTime)
+                if not clicking then break end
             end
         end
     end)
+end)
+
+-- Stop clicking if UI is closed or something (optional)
+closeBtn.MouseButton1Click:Connect(function()
+    clicking = false
+end)
+minBtn.MouseButton1Click:Connect(function()
+    clicking = false
 end)
 
 minimize.MouseButton1Click:Connect(function()
