@@ -31,20 +31,16 @@ local function startAutoClicker()
 	end)
 end
 
--- UI Library setup (assuming you have one)
-local Library = loadstring(game:HttpGet("https://pastebin.com/raw/someUILibrary"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/centexy/DeltaLibrary/main/source.lua"))()
 local Window = Library:CreateWindow("iSights Hypershot Utility")
 
--- Info Tab
+local MainTab = Window:CreateTab("Main")
 local InfoTab = Window:CreateTab("Info")
+
 InfoTab:CreateLabel("Made by iSight Zyx & Imran")
 InfoTab:CreateLabel("How to Use: Enable Auto Farm")
 InfoTab:CreateLabel("Auto Reload must be equipped in Slot 1")
 
--- Main Tab
-local MainTab = Window:CreateTab("Main")
-
--- Auto Farm
 local autoFarmOn = false
 local autoFarmBtn = MainTab:CreateButton("Auto Farm: OFF", function()
 	autoFarmOn = not autoFarmOn
@@ -53,19 +49,17 @@ local autoFarmBtn = MainTab:CreateButton("Auto Farm: OFF", function()
 		getgenv().AFARM = true
 		loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
 	else
-		MainTab:UpdateButton("Auto Farm: Reset ur game to stop nigga")
+		MainTab:UpdateButton("Auto Farm: OFF")
 		getgenv().AFARM = false
-		-- kill auto farm thread or loop here if needed
+		getgenv().AFARMKILL = true
 	end
 end)
 
--- Auto Clicker
 MainTab:CreateButton("Open Auto Clicker", function()
 	local ClickerUI = Library:CreateWindow("Auto Clicker")
 	local Tab = ClickerUI:CreateTab("Control")
 
 	Tab:CreateButton("Add Click Point", function()
-		print("Tap where you want to click next")
 		local pos = UIS:GetMouseLocation()
 		table.insert(clickPoints, pos)
 	end)
@@ -73,6 +67,7 @@ MainTab:CreateButton("Open Auto Clicker", function()
 	Tab:CreateBox("Click Delay (sec)", function(text)
 		clickDelay = tonumber(text) or 0.5
 	end)
+
 	Tab:CreateBox("Click Count", function(text)
 		clickCount = tonumber(text) or 10
 	end)
@@ -81,7 +76,7 @@ MainTab:CreateButton("Open Auto Clicker", function()
 		startAutoClicker()
 	end)
 
-	Tab:CreateButton("Pause Clicker", function()
+	Tab:CreateButton("Pause/Resume Clicker", function()
 		clickerPaused = not clickerPaused
 	end)
 
@@ -90,3 +85,5 @@ MainTab:CreateButton("Open Auto Clicker", function()
 		clickPoints = {}
 	end)
 end)
+
+Library:Init()
