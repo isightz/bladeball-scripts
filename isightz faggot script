@@ -1,179 +1,133 @@
--- Auto-load script on startup
-loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-No-Ability-Cooldown-Open-Sourced-47339"))()
+-- isights hypershot utility UI for mobile
+-- made by isight zyx and imran
 
--- Create UI
-local CoreGui = game:GetService("CoreGui")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local TopBar = Instance.new("Frame")
+local Minimize = Instance.new("TextButton")
+local Tabs = Instance.new("Frame")
+local MainTab = Instance.new("TextButton")
+local InfoTab = Instance.new("TextButton")
+local Pages = Instance.new("Frame")
+local MainPage = Instance.new("Frame")
+local ToggleAutoFarm = Instance.new("TextButton")
+local InfoPage = Instance.new("Frame")
+local InfoLabel = Instance.new("TextLabel")
+local HiddenIcon = Instance.new("TextButton")
 
--- Create GUI base
-local gui = Instance.new("ScreenGui", CoreGui)
-gui.Name = "iSightsHypershotUI"
-gui.ResetOnSpawn = false
+local autofarmRunning = false
+local autofarmConnection
 
--- Minimized Button
-local miniBtn = Instance.new("ImageButton")
-miniBtn.Parent = gui
-miniBtn.Size = UDim2.new(0, 40, 0, 40)
-miniBtn.Position = UDim2.new(0, 10, 0, 100)
-miniBtn.Image = "rbxassetid://3926305904" -- delta-style icon (edit as needed)
-miniBtn.ImageRectOffset = Vector2.new(124, 204)
-miniBtn.ImageRectSize = Vector2.new(36, 36)
-miniBtn.BackgroundTransparency = 1
-miniBtn.Visible = false
+-- GUI Properties
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
 
--- Main UI Frame
-local mainFrame = Instance.new("Frame", gui)
-mainFrame.Size = UDim2.new(0, 500, 0, 320)
-mainFrame.Position = UDim2.new(0.5, -250, 0.5, -160)
-mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-mainFrame.BackgroundTransparency = 0.2
-mainFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-mainFrame.Active = true
-mainFrame.Draggable = true
+MainFrame.Size = UDim2.new(0, 400, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.BackgroundTransparency = 0.2
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BorderColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BorderSizePixel = 2
+MainFrame.Parent = ScreenGui
 
--- Top Bar
-local topBar = Instance.new("Frame", mainFrame)
-topBar.Size = UDim2.new(1, 0, 0, 35)
-topBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TopBar.Size = UDim2.new(1, 0, 0, 30)
+TopBar.BackgroundTransparency = 1
+TopBar.Parent = MainFrame
 
-local title = Instance.new("TextLabel", topBar)
-title.Text = "iSights Hypershot Utility"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 16
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.BackgroundTransparency = 1
-title.Size = UDim2.new(1, -40, 1, 0)
-title.Position = UDim2.new(0, 10, 0, 0)
-title.TextXAlignment = Enum.TextXAlignment.Left
+Minimize.Size = UDim2.new(0, 30, 0, 30)
+Minimize.Position = UDim2.new(1, -30, 0, 0)
+Minimize.Text = "-"
+Minimize.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
+Minimize.Parent = TopBar
 
--- Minimize Button
-local minimize = Instance.new("TextButton", topBar)
-minimize.Size = UDim2.new(0, 30, 1, 0)
-minimize.Position = UDim2.new(1, -35, 0, 0)
-minimize.Text = "-"
-minimize.TextColor3 = Color3.fromRGB(255, 255, 255)
-minimize.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-minimize.Font = Enum.Font.Gotham
-minimize.TextSize = 20
+Tabs.Size = UDim2.new(0, 100, 1, -30)
+Tabs.Position = UDim2.new(0, 0, 0, 30)
+Tabs.BackgroundTransparency = 1
+Tabs.Parent = MainFrame
 
--- Left Tab Bar
-local tabBar = Instance.new("Frame", mainFrame)
-tabBar.Size = UDim2.new(0, 120, 1, -35)
-tabBar.Position = UDim2.new(0, 0, 0, 35)
-tabBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainTab.Size = UDim2.new(1, 0, 0, 40)
+MainTab.Text = "Main"
+MainTab.Parent = Tabs
 
--- Right Content Area
-local contentFrame = Instance.new("Frame", mainFrame)
-contentFrame.Size = UDim2.new(1, -120, 1, -35)
-contentFrame.Position = UDim2.new(0, 120, 0, 35)
-contentFrame.BackgroundTransparency = 1
+InfoTab.Size = UDim2.new(1, 0, 0, 40)
+InfoTab.Position = UDim2.new(0, 0, 0, 40)
+InfoTab.Text = "Info"
+InfoTab.Parent = Tabs
 
--- Tab Buttons
-local infoTabBtn = Instance.new("TextButton", tabBar)
-infoTabBtn.Size = UDim2.new(1, 0, 0, 40)
-infoTabBtn.Position = UDim2.new(0, 0, 0, 0)
-infoTabBtn.Text = "Info"
-infoTabBtn.Font = Enum.Font.Gotham
-infoTabBtn.TextSize = 14
-infoTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-infoTabBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Pages.Size = UDim2.new(1, -100, 1, -30)
+Pages.Position = UDim2.new(0, 100, 0, 30)
+Pages.BackgroundTransparency = 1
+Pages.Parent = MainFrame
 
-local mainTabBtn = Instance.new("TextButton", tabBar)
-mainTabBtn.Size = UDim2.new(1, 0, 0, 40)
-mainTabBtn.Position = UDim2.new(0, 0, 0, 40)
-mainTabBtn.Text = "Main"
-mainTabBtn.Font = Enum.Font.Gotham
-mainTabBtn.TextSize = 14
-mainTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-mainTabBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MainPage.Size = UDim2.new(1, 0, 1, 0)
+MainPage.BackgroundTransparency = 1
+MainPage.Visible = true
+MainPage.Parent = Pages
 
--- Info Page
-local infoPage = Instance.new("TextLabel", contentFrame)
-infoPage.Size = UDim2.new(1, -20, 1, -20)
-infoPage.Position = UDim2.new(0, 10, 0, 10)
-infoPage.TextWrapped = true
-infoPage.TextXAlignment = Enum.TextXAlignment.Left
-infoPage.TextYAlignment = Enum.TextYAlignment.Top
-infoPage.BackgroundTransparency = 1
-infoPage.TextColor3 = Color3.fromRGB(255, 255, 255)
-infoPage.Font = Enum.Font.Gotham
-infoPage.TextSize = 14
-infoPage.Text = [[
-Made by iSight, ZYX, and Imran
+ToggleAutoFarm.Size = UDim2.new(0, 200, 0, 50)
+ToggleAutoFarm.Position = UDim2.new(0.5, -100, 0.5, -25)
+ToggleAutoFarm.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleAutoFarm.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleAutoFarm.Text = "Auto Farm: OFF"
+ToggleAutoFarm.Parent = MainPage
 
-Usage:
-- Enable "Auto Farm" from Main tab.
-- Make sure "Auto Reload" ability is on your first slot.
-- UI auto-loads script when executed.
-]]
+InfoPage.Size = UDim2.new(1, 0, 1, 0)
+InfoPage.BackgroundTransparency = 1
+InfoPage.Visible = false
+InfoPage.Parent = Pages
 
--- Main Page
-local mainPage = Instance.new("Frame", contentFrame)
-mainPage.Size = UDim2.new(1, 0, 1, 0)
-mainPage.Position = UDim2.new(0, 0, 0, 0)
-mainPage.BackgroundTransparency = 1
-mainPage.Visible = false
+InfoLabel.Size = UDim2.new(1, -20, 1, -20)
+InfoLabel.Position = UDim2.new(0, 10, 0, 10)
+InfoLabel.TextWrapped = true
+InfoLabel.Text = "Made by Isight Zyx and Imran\n\nTo use Auto Farm, equip auto reload ability in first slot."
+InfoLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+InfoLabel.BackgroundTransparency = 1
+InfoLabel.Parent = InfoPage
 
--- Auto Farm Toggle
-local autoFarmOn = false
-local autoFarmThread = nil
+HiddenIcon.Size = UDim2.new(0, 40, 0, 40)
+HiddenIcon.Position = UDim2.new(0, 10, 0, 100)
+HiddenIcon.Text = "☰"
+HiddenIcon.Visible = false
+HiddenIcon.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+HiddenIcon.TextColor3 = Color3.fromRGB(255, 255, 255)
+HiddenIcon.Parent = ScreenGui
 
-local autoFarmBtn = Instance.new("TextButton", mainPage)
-autoFarmBtn.Size = UDim2.new(0, 200, 0, 40)
-autoFarmBtn.Position = UDim2.new(0, 10, 0, 10)
-autoFarmBtn.Text = "Auto Farm: OFF"
-autoFarmBtn.Font = Enum.Font.Gotham
-autoFarmBtn.TextSize = 14
-autoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-autoFarmBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-
-autoFarmBtn.MouseButton1Click:Connect(function()
-    autoFarmOn = not autoFarmOn
-    if autoFarmOn then
-        autoFarmBtn.Text = "Auto Farm: ON"
-        autoFarmThread = coroutine.create(function()
-            repeat
-                loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
-                wait(5) -- re-run every 5 seconds
-            until not autoFarmOn
-        end)
-        coroutine.resume(autoFarmThread)
+-- Functions
+local function toggleAutoFarm()
+    autofarmRunning = not autofarmRunning
+    ToggleAutoFarm.Text = "Auto Farm: " .. (autofarmRunning and "ON" or "OFF")
+    
+    if autofarmRunning then
+        autofarmConnection = loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
     else
-        autoFarmBtn.Text = "Auto Farm: OFF"
-        autoFarmOn = false
+        if autofarmConnection and type(autofarmConnection) == "function" then
+            pcall(function()
+                autofarmConnection("stop")
+            end)
+        end
     end
+end
+
+-- Event Connections
+ToggleAutoFarm.MouseButton1Click:Connect(toggleAutoFarm)
+MainTab.MouseButton1Click:Connect(function()
+    MainPage.Visible = true
+    InfoPage.Visible = false
+end)
+InfoTab.MouseButton1Click:Connect(function()
+    MainPage.Visible = false
+    InfoPage.Visible = true
+end)
+Minimize.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    HiddenIcon.Visible = true
+end)
+HiddenIcon.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    HiddenIcon.Visible = false
 end)
 
--- Tab Switch Logic
-infoTabBtn.MouseButton1Click:Connect(function()
-    infoPage.Visible = true
-    mainPage.Visible = false
-end)
-
-mainTabBtn.MouseButton1Click:Connect(function()
-    infoPage.Visible = false
-    mainPage.Visible = true
-end)
-
--- Minimize logic
-minimize.MouseButton1Click:Connect(function()
-    mainFrame.Visible = false
-    miniBtn.Visible = true
-end)
-
-miniBtn.MouseButton1Click:Connect(function()
-    mainFrame.Visible = true
-    miniBtn.Visible = false
-end)
-
--- Draggable Mini Icon
-local dragging, dragInput, startPos, startInputPos
-
-miniBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        startInputPos = input.Position
-        startPos = miniBtn.Position
-
-        input
+-- Auto run ability cooldown script
+loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-No-Ability-Cooldown-Open-Sourced-47339"))()
