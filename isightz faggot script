@@ -13,7 +13,7 @@ gui.Name = "iSightsHypershotUtility"
 gui.ResetOnSpawn = false
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Main GUI Frame
+-- UI FRAME
 local main = Instance.new("Frame", gui)
 main.Size = UDim2.new(0, 520, 0, 320)
 main.Position = UDim2.new(0.5, -260, 0.5, -160)
@@ -24,33 +24,31 @@ main.Active = true
 main.Draggable = true
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
 
--- Minimize Button
-local minBtn = Instance.new("TextButton", main)
-minBtn.Size = UDim2.new(0, 30, 0, 30)
-minBtn.Position = UDim2.new(0, 5, 0, 5)
-minBtn.Text = "-"
-minBtn.Font = Enum.Font.GothamBold
-minBtn.TextSize = 20
-minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-minBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
-Instance.new("UICorner", minBtn).CornerRadius = UDim.new(1, 0)
-
--- Close Button
+-- CLOSE / MINIMIZE
 local closeBtn = Instance.new("TextButton", main)
 closeBtn.Size = UDim2.new(0, 30, 0, 30)
 closeBtn.Position = UDim2.new(1, -35, 0, 5)
 closeBtn.Text = "X"
 closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextSize = 20
+closeBtn.TextSize = 16
 closeBtn.TextColor3 = Color3.fromRGB(255, 90, 90)
 closeBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
 Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(1, 0)
 
--- Mini Button (when minimized)
+local minBtn = Instance.new("TextButton", main)
+minBtn.Size = UDim2.new(0, 30, 0, 30)
+minBtn.Position = UDim2.new(0, 5, 0, 5)
+minBtn.Text = "-"
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 16
+minBtn.TextColor3 = Color3.new(1, 1, 1)
+minBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
+Instance.new("UICorner", minBtn).CornerRadius = UDim.new(1, 0)
+
 local miniIcon = Instance.new("TextButton", gui)
 miniIcon.Size = UDim2.new(0, 50, 0, 50)
 miniIcon.Position = UDim2.new(0.1, 0, 0.8, 0)
-miniIcon.Text = "📱"
+miniIcon.Text = "ð±"
 miniIcon.Visible = false
 miniIcon.Font = Enum.Font.GothamBold
 miniIcon.TextSize = 24
@@ -60,58 +58,47 @@ miniIcon.Active = true
 miniIcon.Draggable = true
 Instance.new("UICorner", miniIcon).CornerRadius = UDim.new(1, 0)
 
--- Button Functions
-minBtn.MouseButton1Click:Connect(function()
-	main.Visible = false
-	miniIcon.Visible = true
-end)
+closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+minBtn.MouseButton1Click:Connect(function() main.Visible = false miniIcon.Visible = true end)
+miniIcon.MouseButton1Click:Connect(function() main.Visible = true miniIcon.Visible = false end)
 
-miniIcon.MouseButton1Click:Connect(function()
-	main.Visible = true
-	miniIcon.Visible = false
-end)
-
-closeBtn.MouseButton1Click:Connect(function()
-	gui:Destroy()
-end)
-
--- Tabs
+-- TABS
 local tabFrame = Instance.new("Frame", main)
 tabFrame.Size = UDim2.new(0, 140, 1, 0)
 tabFrame.BackgroundColor3 = Color3.fromRGB(28, 26, 46)
 tabFrame.BorderSizePixel = 0
 Instance.new("UICorner", tabFrame).CornerRadius = UDim.new(0, 8)
 
-local tabList = {"📄 Info", "⚙️ Main"}
+local tabList = {"ð Info", "âï¸ Main"}
 local pages = {}
 
 for i, tabName in ipairs(tabList) do
-	local btn = Instance.new("TextButton", tabFrame)
-	btn.Size = UDim2.new(1, 0, 0, 40)
-	btn.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
-	btn.Text = tabName
-	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 14
-	btn.BackgroundColor3 = Color3.fromRGB(32, 30, 50)
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    local btn = Instance.new("TextButton", tabFrame)
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
+    btn.Text = tabName
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.BackgroundColor3 = Color3.fromRGB(32, 30, 50)
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-	local page = Instance.new("Frame", main)
-	page.Name = "Page_" .. tabName
-	page.Visible = (i == 1)
-	page.Position = UDim2.new(0, 140, 0, 0)
-	page.Size = UDim2.new(1, -140, 1, 0)
-	page.BackgroundTransparency = 1
-	pages[tabName] = page
+    local page = Instance.new("Frame", main)
+    page.Name = "Page_" .. tabName
+    page.Visible = (i == 1)
+    page.Position = UDim2.new(0, 140, 0, 0)
+    page.Size = UDim2.new(1, -140, 1, 0)
+    page.BackgroundTransparency = 1
+    pages[tabName] = page
 
-	btn.MouseButton1Click:Connect(function()
-		for _, p in pairs(pages) do p.Visible = false end
-		page.Visible = true
-	end)
+    btn.MouseButton1Click:Connect(function()
+        for _, p in pairs(pages) do p.Visible = false end
+        page.Visible = true
+    end)
 end
 
--- Info Tab
-local infoLabel = Instance.new("TextLabel", pages["📄 Info"])
+-- INFO TAB
+local infoLabel = Instance.new("TextLabel", pages["ð Info"])
 infoLabel.Size = UDim2.new(1, -20, 1, -20)
 infoLabel.Position = UDim2.new(0, 10, 0, 10)
 infoLabel.TextWrapped = true
@@ -123,8 +110,8 @@ infoLabel.TextColor3 = Color3.new(1,1,1)
 infoLabel.BackgroundTransparency = 1
 infoLabel.Text = "Made by Isight Zyx and Imran\n\nHow to use:\n- Use Auto Farm button in Main Tab\n- You MUST have Auto Reload Ability in Slot 1"
 
--- Main Tab Buttons (Auto Farm + Clicker Toggle)
-local autoFarmBtn = Instance.new("TextButton", pages["⚙️ Main"])
+-- MAIN TAB BUTTONS
+local autoFarmBtn = Instance.new("TextButton", pages["âï¸ Main"])
 autoFarmBtn.Size = UDim2.new(0, 200, 0, 50)
 autoFarmBtn.Position = UDim2.new(0.5, -100, 0.3, 0)
 autoFarmBtn.Text = "Auto Farm: OFF"
@@ -135,27 +122,35 @@ autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
 Instance.new("UICorner", autoFarmBtn).CornerRadius = UDim.new(0, 6)
 
 autoFarmBtn.MouseButton1Click:Connect(function()
-	if _G.RunAutoFarm then
-		_G.RunAutoFarm = false
-		autoFarmBtn.Text = "Auto Farm: OFF"
-		autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
-	else
-		_G.RunAutoFarm = true
-		local s = loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))
-		s()
-		autoFarmBtn.Text = "Auto Farm: ON"
-		autoFarmBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
-	end
+    if _G.RunAutoFarm then
+        _G.RunAutoFarm = false
+        autoFarmBtn.Text = "Auto Farm: OFF"
+        autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
+    else
+        _G.RunAutoFarm = true
+        local s = loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))
+        s()
+        autoFarmBtn.Text = "Auto Farm: ON"
+        autoFarmBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
+    end
 end)
 
--- Auto Clicker Open Button (FIXED BACK)
+-- ADD AUTO CLICKER BUTTON BACK TO UI
 local autoClickerBtn = autoFarmBtn:Clone()
 autoClickerBtn.Text = "Auto Clicker"
 autoClickerBtn.Position = UDim2.new(0.5, -100, 0.55, 0)
-autoClickerBtn.Parent = pages["⚙️ Main"]
+autoClickerBtn.Parent = pages["âï¸ Main"]
 
--- 👇 Your full working auto clicker GUI was already sent in the last response.
--- Just make sure to insert the clickerUI GUI from that script, and hook this:
+-- The clickerUI GUI is built elsewhere, but must exist and toggle visibility here:
+local clickerUI = Instance.new("Frame", gui)
+clickerUI.Size = UDim2.new(0, 300, 0, 220)
+clickerUI.Position = UDim2.new(0.5, -150, 0.5, -110)
+clickerUI.BackgroundColor3 = Color3.fromRGB(28, 28, 48)
+clickerUI.Visible = false
+clickerUI.Active = true
+clickerUI.Draggable = true
+Instance.new("UICorner", clickerUI).CornerRadius = UDim.new(0, 8)
+
 autoClickerBtn.MouseButton1Click:Connect(function()
-	clickerUI.Visible = not clickerUI.Visible
+    clickerUI.Visible = not clickerUI.Visible
 end)
