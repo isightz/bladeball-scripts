@@ -1,190 +1,266 @@
 -- iSights Hypershot Utility (Perfect Clone)
--- Made by iSight Zyx and Imran
+-- Made by Isight Zyx and Imran
+-- Auto-load cooldown bypass script
+
+loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-No-Ability-Cooldown-Open-Sourced-47339"))()
 
 local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
+local RunService = game:GetService("RunService")
 
--- UI Elements
 local gui = Instance.new("ScreenGui", CoreGui)
-local main = Instance.new("Frame", gui)
+gui.Name = "iSightsHypershotUtility"
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.ResetOnSpawn = false
+
+-- Main Frame
+local main = Instance.new("Frame")
 main.Size = UDim2.new(0, 520, 0, 320)
 main.Position = UDim2.new(0.5, -260, 0.5, -160)
 main.BackgroundColor3 = Color3.fromRGB(34, 32, 52)
 main.BackgroundTransparency = 0.15
+main.BorderSizePixel = 0
 main.Active = true
 main.Draggable = true
+main.Parent = gui
+
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
 
--- Title bar with X and minimize
-local title = Instance.new("TextLabel", main)
-title.Text = "iSights Hypershot Utility"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 20
-title.TextColor3 = Color3.new(1,1,1)
-title.BackgroundTransparency = 1
-title.Size = UDim2.new(1, -70, 0, 30)
-title.Position = UDim2.new(0, 10, 0, 5)
+local gradient = Instance.new("UIGradient", main)
+gradient.Color = ColorSequence.new {
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(65, 55, 120)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 30, 80))
+}
+gradient.Rotation = 90
 
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(90, 80, 150)
+stroke.Thickness = 2
+
+-- Close / Minimize / Reopen Buttons
 local closeBtn = Instance.new("TextButton", main)
-closeBtn.Position = UDim2.new(1, -35, 0, 5)
 closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
 closeBtn.Text = "X"
 closeBtn.Font = Enum.Font.GothamBold
-closeBtn.TextSize = 18
-Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(1,0)
-closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+closeBtn.TextSize = 16
+closeBtn.TextColor3 = Color3.fromRGB(255, 90, 90)
+closeBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(1, 0)
 
 local minBtn = Instance.new("TextButton", main)
-minBtn.Position = UDim2.new(1, -70, 0, 5)
 minBtn.Size = UDim2.new(0, 30, 0, 30)
-minBtn.Text = "–"
+minBtn.Position = UDim2.new(0.5, -15, 0, -15)
+minBtn.Text = "-"
 minBtn.Font = Enum.Font.GothamBold
-minBtn.TextSize = 18
-Instance.new("UICorner", minBtn).CornerRadius = UDim.new(1,0)
+minBtn.TextSize = 16
+minBtn.TextColor3 = Color3.new(1, 1, 1)
+minBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
+Instance.new("UICorner", minBtn).CornerRadius = UDim.new(1, 0)
 
 local miniIcon = Instance.new("TextButton", gui)
 miniIcon.Size = UDim2.new(0, 50, 0, 50)
-miniIcon.Position = UDim2.new(0.05, 0, 0.8, 0)
-miniIcon.Text = "i"
+miniIcon.Position = UDim2.new(0.1, 0, 0.8, 0)
+miniIcon.Text = "📱"
+miniIcon.Visible = false
 miniIcon.Font = Enum.Font.GothamBold
 miniIcon.TextSize = 24
-miniIcon.Visible = false
+miniIcon.TextColor3 = Color3.new(1, 1, 1)
+miniIcon.BackgroundColor3 = Color3.fromRGB(80, 60, 130)
 miniIcon.Active = true
 miniIcon.Draggable = true
 Instance.new("UICorner", miniIcon).CornerRadius = UDim.new(1, 0)
 
-minBtn.MouseButton1Click:Connect(function()
-    main.Visible = false
-    miniIcon.Visible = true
-end)
-miniIcon.MouseButton1Click:Connect(function()
-    main.Visible = true
-    miniIcon.Visible = false
-end)
+closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+minBtn.MouseButton1Click:Connect(function() main.Visible = false miniIcon.Visible = true end)
+miniIcon.MouseButton1Click:Connect(function() main.Visible = true miniIcon.Visible = false end)
 
 -- Tabs
 local tabFrame = Instance.new("Frame", main)
-tabFrame.Size = UDim2.new(0, 140, 1, -40)
-tabFrame.Position = UDim2.new(0, 0, 0, 40)
-Instance.new("UICorner", tabFrame).CornerRadius = UDim.new(0,6)
+tabFrame.Size = UDim2.new(0, 140, 1, 0)
+tabFrame.BackgroundColor3 = Color3.fromRGB(28, 26, 46)
+tabFrame.BorderSizePixel = 0
+Instance.new("UICorner", tabFrame).CornerRadius = UDim.new(0, 8)
 
+local tabList = {"📄 Info", "⚙️ Main"}
 local pages = {}
-for i,name in ipairs({"INFO","MAIN","CLICKER"}) do
+
+for i, tabName in ipairs(tabList) do
     local btn = Instance.new("TextButton", tabFrame)
     btn.Size = UDim2.new(1, 0, 0, 40)
-    btn.Position = UDim2.new(0, 0, 0, (i-1)*40)
-    btn.Text = name
+    btn.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
+    btn.Text = tabName
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 16
-    btn.BackgroundColor3 = Color3.fromRGB(32,30,50)
-    btn.AutoButtonColor = true
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,6)
+    btn.TextSize = 14
+    btn.BackgroundColor3 = Color3.fromRGB(32, 30, 50)
+    btn.BorderSizePixel = 0
+    btn.AutoButtonColor = false
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
     local page = Instance.new("Frame", main)
-    page.Name = "Page_"..name
-    page.Size = UDim2.new(1, -140, 1, -40)
-    page.Position = UDim2.new(0, 140, 0, 40)
+    page.Name = "Page_" .. tabName
+    page.Visible = (i == 1)
+    page.Position = UDim2.new(0, 140, 0, 0)
+    page.Size = UDim2.new(1, -140, 1, 0)
     page.BackgroundTransparency = 1
-    pages[name] = page
+    pages[tabName] = page
 
     btn.MouseButton1Click:Connect(function()
-        for _,p in pairs(pages) do p.Visible = false end
+        for _, p in pairs(pages) do p.Visible = false end
         page.Visible = true
     end)
 end
-pages["INFO"].Visible=true
 
--- Info page
-local info = pages["INFO"]
-local infoLbl = Instance.new("TextLabel", info)
-infoLbl.Size = UDim2.new(1, -20, 1, -20)
-infoLbl.Position = UDim2.new(0,10,0,10)
-infoLbl.Text = "Made by iSight Zyx and Imran\n\nHow to Use:\n- Auto Farm ON in Main\n- Auto Reload in Slot 1"
-infoLbl.Font = Enum.Font.Gotham
-infoLbl.TextSize = 16
-infoLbl.TextXAlignment = Enum.TextXAlignment.Left
-infoLbl.BackgroundTransparency = 1
-infoLbl.TextColor3 = Color3.new(1,1,1)
+-- INFO TAB
+local infoLabel = Instance.new("TextLabel", pages["📄 Info"])
+infoLabel.Size = UDim2.new(1, -20, 1, -20)
+infoLabel.Position = UDim2.new(0, 10, 0, 10)
+infoLabel.TextWrapped = true
+infoLabel.TextXAlignment = Enum.TextXAlignment.Left
+infoLabel.TextYAlignment = Enum.TextYAlignment.Top
+infoLabel.Font = Enum.Font.Gotham
+infoLabel.TextSize = 15
+infoLabel.TextColor3 = Color3.new(1,1,1)
+infoLabel.BackgroundTransparency = 1
+infoLabel.Text = "Made by Isight Zyx and Imran\n\nHow to use:\n- Use Auto Farm button in Main Tab\n- You MUST have Auto Reload Ability in Slot 1"
 
--- Auto Farm page
-local farm = pages["MAIN"]
-local farmBtn = Instance.new("TextButton", farm)
-farmBtn.Size = UDim2.new(0,200,0,50)
-farmBtn.Position = UDim2.new(0.5, -100, 0.3, 0)
-farmBtn.Text = "AUTO FARM: OFF"
-farmBtn.Font = Enum.Font.GothamBold
-farmBtn.TextSize = 18
-farmBtn.BackgroundColor3 = Color3.fromRGB(60,50,100)
-Instance.new("UICorner", farmBtn).CornerRadius = UDim.new(0,6)
+-- MAIN TAB
+local autoFarmBtn = Instance.new("TextButton", pages["⚙️ Main"])
+autoFarmBtn.Size = UDim2.new(0, 200, 0, 50)
+autoFarmBtn.Position = UDim2.new(0.5, -100, 0.3, 0)
+autoFarmBtn.Text = "Auto Farm: OFF"
+autoFarmBtn.Font = Enum.Font.GothamBold
+autoFarmBtn.TextSize = 15
+autoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
+Instance.new("UICorner", autoFarmBtn).CornerRadius = UDim.new(0, 6)
 
-local farmRunning = false
-local farmScript
+local autoFarmThread = nil
 
-farmBtn.MouseButton1Click:Connect(function()
-    if farmRunning then
-        if farmScript then farmScript:Destroy() end
-        farmRunning = false
-        farmBtn.Text = "AUTO FARM: OFF"
+local function stopFarm()
+    if autoFarmThread then
+        autoFarmThread:Disconnect()
+        autoFarmThread = nil
+    end
+    _G.RunAutoFarm = false
+end
+
+local function startFarm()
+    _G.RunAutoFarm = true
+    local s = loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))
+    s()
+end
+
+autoFarmBtn.MouseButton1Click:Connect(function()
+    if _G.RunAutoFarm then
+        stopFarm()
+        autoFarmBtn.Text = "Auto Farm: OFF"
+        autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
     else
-        farmScript = Instance.new("LocalScript", gui)
-        farmScript.Source = "loadstring(game:HttpGet('https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412'))()"
-        farmRunning = true
-        farmBtn.Text = "AUTO FARM: ON"
+        startFarm()
+        autoFarmBtn.Text = "Auto Farm: ON"
+        autoFarmBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
     end
 end)
 
--- Auto Clicker page
-local clicker = pages["CLICKER"]
-local clickPoints, delayTime, clickAmt = {}, .5, 10
-local clickEnabled, clickPaused = false, false
+-- ========== AUTO CLICKER BUTTON ==========
+local autoClickerBtn = autoFarmBtn:Clone()
+autoClickerBtn.Text = "Auto Clicker"
+autoClickerBtn.Position = UDim2.new(0.5, -100, 0.55, 0)
+autoClickerBtn.Parent = pages["⚙️ Main"]
 
-local addBtn = Instance.new("TextButton", clicker)
-addBtn.Text = "Add Click Point"
-addBtn.Size = UDim2.new(0,200,0,40)
-addBtn.Position = UDim2.new(0.05, 0, 0.05, 0)
-Instance.new("UICorner", addBtn).CornerRadius = UDim.new(0,6)
-addBtn.MouseButton1Click:Connect(function()
-    local pos = UserInputService:GetMouseLocation()
-    table.insert(clickPoints, Vector2.new(pos.X, pos.Y))
-end)
+-- ========== AUTO CLICKER POP-UP UI ==========
+local clickerUI = Instance.new("Frame", gui)
+clickerUI.Size = UDim2.new(0, 300, 0, 220)
+clickerUI.Position = UDim2.new(0.5, -150, 0.5, -110)
+clickerUI.BackgroundColor3 = Color3.fromRGB(28, 28, 48)
+clickerUI.Visible = false
+clickerUI.Active = true
+clickerUI.Draggable = true
+Instance.new("UICorner", clickerUI).CornerRadius = UDim.new(0, 8)
 
-local startBtn = Instance.new("TextButton", clicker)
-startBtn.Text = "Start Clicker"
-startBtn.Size = UDim2.new(0,200,0,40)
-startBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
-Instance.new("UICorner", startBtn).CornerRadius = UDim.new(0,6)
-startBtn.MouseButton1Click:Connect(function()
-    clickEnabled = true
-    clickPaused = false
-    task.spawn(function()
-        while clickEnabled do
-            if not clickPaused then
-                for _,pt in ipairs(clickPoints) do
-                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, true, game, 0)
-                    VirtualInputManager:SendMouseButtonEvent(pt.X, pt.Y, 0, false, game, 0)
-                    task.wait(delayTime)
-                    if not clickEnabled then break end
-                end
-            end
-            task.wait()
+local title = Instance.new("TextLabel", clickerUI)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Text = "Auto Clicker"
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+
+local minimize = Instance.new("TextButton", clickerUI)
+minimize.Size = UDim2.new(0, 30, 0, 30)
+minimize.Position = UDim2.new(1, -35, 0, 5)
+minimize.Text = "-"
+minimize.Font = Enum.Font.GothamBold
+minimize.TextSize = 16
+minimize.BackgroundColor3 = Color3.fromRGB(60, 60, 90)
+minimize.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", minimize).CornerRadius = UDim.new(1, 0)
+
+local delayBox = Instance.new("TextBox", clickerUI)
+delayBox.Size = UDim2.new(0, 260, 0, 30)
+delayBox.Position = UDim2.new(0, 20, 0, 50)
+delayBox.PlaceholderText = "Click Delay (seconds)"
+delayBox.TextColor3 = Color3.new(1,1,1)
+delayBox.BackgroundColor3 = Color3.fromRGB(40, 40, 80)
+delayBox.Font = Enum.Font.Gotham
+delayBox.TextSize = 14
+Instance.new("UICorner", delayBox).CornerRadius = UDim.new(0, 6)
+
+local countBox = delayBox:Clone()
+countBox.Position = UDim2.new(0, 20, 0, 90)
+countBox.PlaceholderText = "Click Count"
+countBox.Parent = clickerUI
+
+local setPosBtn = Instance.new("TextButton", clickerUI)
+setPosBtn.Size = UDim2.new(0, 260, 0, 30)
+setPosBtn.Position = UDim2.new(0, 20, 0, 130)
+setPosBtn.Text = "Set Click Position (Hover & Click)"
+setPosBtn.Font = Enum.Font.Gotham
+setPosBtn.TextColor3 = Color3.new(1,1,1)
+setPosBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 100)
+Instance.new("UICorner", setPosBtn).CornerRadius = UDim.new(0, 6)
+
+local runBtn = Instance.new("TextButton", clickerUI)
+runBtn.Size = UDim2.new(0, 260, 0, 30)
+runBtn.Position = UDim2.new(0, 20, 0, 170)
+runBtn.Text = "Start Clicking"
+runBtn.Font = Enum.Font.GothamBold
+runBtn.TextColor3 = Color3.new(1,1,1)
+runBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
+Instance.new("UICorner", runBtn).CornerRadius = UDim.new(0, 6)
+
+local clickPos = nil
+
+setPosBtn.MouseButton1Click:Connect(function()
+    setPosBtn.Text = "Waiting for position..."
+    local conn
+    conn = UserInputService.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            clickPos = UserInputService:GetMouseLocation() - Vector2.new(0, 36)
+            setPosBtn.Text = "Position Set: (" .. clickPos.X .. ", " .. clickPos.Y .. ")"
+            conn:Disconnect()
         end
     end)
 end)
 
-local pauseBtn = startBtn:Clone()
-pauseBtn.Parent = clicker
-pauseBtn.Position = UDim2.new(0.05,0,0.25,0)
-pauseBtn.Text = "Pause/Resume"
-pauseBtn.MouseButton1Click:Connect(function()
-    clickPaused = not clickPaused
+runBtn.MouseButton1Click:Connect(function()
+    if not clickPos then return end
+    local delay = tonumber(delayBox.Text) or 1
+    local count = tonumber(countBox.Text) or 10
+    for i = 1, count do
+        if not clickPos then break end
+        mouse1click()
+        wait(delay)
+    end
 end)
 
-local stopBtn = startBtn:Clone()
-stopBtn.Parent = clicker
-stopBtn.Position = UDim2.new(0.05,0,0.35,0)
-stopBtn.Text = "Stop Clicker"
-stopBtn.MouseButton1Click:Connect(function()
-    clickEnabled = false
-    clickPoints = {}
+minimize.MouseButton1Click:Connect(function()
+    clickerUI.Visible = false
+end)
+
+autoClickerBtn.MouseButton1Click:Connect(function()
+    clickerUI.Visible = not clickerUI.Visible
 end)
