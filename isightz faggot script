@@ -1,20 +1,57 @@
---// iSights Hypershot Utility by Zyx & Imran
--- Fully Mobile-Optimized UI with Advanced Auto Clicker Features
+-- iSights Hypershot Utility UI by Zyx & Imran
 
-local UIS = game:GetService("UserInputService")
-local HttpService = game:GetService("HttpService")
-local TweenService = game:GetService("TweenService")
-local VirtualInputManager = game:GetService("VirtualInputManager")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/shlexware/Orion/main/source"))()
 
--- Auto clicker settings
-local clickerEnabled = false
-local clickPoints = {} -- list of positions {Vector2(x,y)}
+local OrionLib = OrionLib or shared.OrionLib
+local Window = OrionLib:MakeWindow({
+	Name = "iSights Hypershot Utility",
+	HidePremium = false,
+	SaveConfig = false,
+	IntroText = "iSights Zyx & Imran",
+	ConfigFolder = "iSightConfig"
+})
+
+-- Auto Farm Toggle
+local autoFarmOn = false
+
+Window:MakeTab({
+	Name = "Main",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+}):AddButton({
+	Name = "Toggle Auto Farm",
+	Callback = function()
+		autoFarmOn = not autoFarmOn
+		if autoFarmOn then
+			getgenv().AFARM = true
+			loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
+			OrionLib:MakeNotification({
+				Name = "Auto Farm",
+				Content = "Auto Farm Activated",
+				Time = 3
+			})
+		else
+			getgenv().AFARM = false
+			OrionLib:MakeNotification({
+				Name = "Auto Farm",
+				Content = "Stopped. Reset to fully unload.",
+				Time = 3
+			})
+		end
+	end
+})
+
+-- Auto Clicker
+local clickPoints = {}
 local clickDelay = 0.5
 local clickCount = 10
+local clickerEnabled = false
 local clickerPaused = false
 
--- Function to perform auto click
-local function startAutoClicker()
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local UserInputService = game:GetService("UserInputService")
+
+local function startClicker()
 	clickerEnabled = true
 	clickerPaused = false
 	task.spawn(function()
@@ -31,59 +68,67 @@ local function startAutoClicker()
 	end)
 end
 
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/centexy/DeltaLibrary/main/source.lua"))()
-local Window = Library:CreateWindow("iSights Hypershot Utility")
+local Tab = Window:MakeTab({
+	Name = "Auto Clicker",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
 
-local MainTab = Window:CreateTab("Main")
-local InfoTab = Window:CreateTab("Info")
-
-InfoTab:CreateLabel("Made by iSight Zyx & Imran")
-InfoTab:CreateLabel("How to Use: Enable Auto Farm")
-InfoTab:CreateLabel("Auto Reload must be equipped in Slot 1")
-
-local autoFarmOn = false
-local autoFarmBtn = MainTab:CreateButton("Auto Farm: OFF", function()
-	autoFarmOn = not autoFarmOn
-	if autoFarmOn then
-		MainTab:UpdateButton("Auto Farm: ON")
-		getgenv().AFARM = true
-		loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
-	else
-		MainTab:UpdateButton("Auto Farm: OFF")
-		getgenv().AFARM = false
-		getgenv().AFARMKILL = true
-	end
-end)
-
-MainTab:CreateButton("Open Auto Clicker", function()
-	local ClickerUI = Library:CreateWindow("Auto Clicker")
-	local Tab = ClickerUI:CreateTab("Control")
-
-	Tab:CreateButton("Add Click Point", function()
-		local pos = UIS:GetMouseLocation()
+Tab:AddButton({
+	Name = "Add Click Point",
+	Callback = function()
+		local pos = UserInputService:GetMouseLocation()
 		table.insert(clickPoints, pos)
-	end)
+		OrionLib:MakeNotification({Name = "Clicker", Content = "Added Point", Time = 2})
+	end
+})
 
-	Tab:CreateBox("Click Delay (sec)", function(text)
+Tab:AddTextbox({
+	Name = "Click Delay (sec)",
+	Default = "0.5",
+	TextDisappear = false,
+	Callback = function(text)
 		clickDelay = tonumber(text) or 0.5
-	end)
+	end
+})
 
-	Tab:CreateBox("Click Count", function(text)
+Tab:AddTextbox({
+	Name = "Click Count",
+	Default = "10",
+	TextDisappear = false,
+	Callback = function(text)
 		clickCount = tonumber(text) or 10
-	end)
+	end
+})
 
-	Tab:CreateButton("Start Clicker", function()
-		startAutoClicker()
-	end)
+Tab:AddButton({
+	Name = "Start Clicker",
+	Callback = function()
+		startClicker()
+	end
+})
 
-	Tab:CreateButton("Pause/Resume Clicker", function()
+Tab:AddButton({
+	Name = "Pause / Resume Clicker",
+	Callback = function()
 		clickerPaused = not clickerPaused
-	end)
+	end
+})
 
-	Tab:CreateButton("Stop Clicker", function()
+Tab:AddButton({
+	Name = "Stop Clicker",
+	Callback = function()
 		clickerEnabled = false
 		clickPoints = {}
-	end)
-end)
+	end
+})
 
-Library:Init()
+-- Info Tab
+Window:MakeTab({
+	Name = "Info",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+}):AddParagraph("iSight Utility", "Made by Zyx & Imran\n\nHow to Use:\n- Enable Auto Farm\n- Ensure Auto Reload is equipped in Slot 1")
+
+-- Done
+OrionLib:Init()
