@@ -73,15 +73,15 @@ miniIcon.Draggable = true
 Instance.new("UICorner", miniIcon).CornerRadius = UDim.new(1, 0)
 
 closeBtn.MouseButton1Click:Connect(function()
-	gui:Destroy()
+    gui:Destroy()
 end)
 minBtn.MouseButton1Click:Connect(function()
-	main.Visible = false
-	miniIcon.Visible = true
+    main.Visible = false
+    miniIcon.Visible = true
 end)
 miniIcon.MouseButton1Click:Connect(function()
-	main.Visible = true
-	miniIcon.Visible = false
+    main.Visible = true
+    miniIcon.Visible = false
 end)
 
 -- Tabs
@@ -95,30 +95,32 @@ local tabList = {"📄 Info", "⚙️ Main"}
 local pages = {}
 
 for i, tabName in ipairs(tabList) do
-	local btn = Instance.new("TextButton", tabFrame)
-	btn.Size = UDim2.new(1, 0, 0, 40)
-	btn.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
-	btn.Text = tabName
-	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 14
-	btn.BackgroundColor3 = Color3.fromRGB(32, 30, 50)
-	btn.BorderSizePixel = 0
-	btn.AutoButtonColor = false
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    local btn = Instance.new("TextButton", tabFrame)
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
+    btn.Text = tabName
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.BackgroundColor3 = Color3.fromRGB(32, 30, 50)
+    btn.BorderSizePixel = 0
+    btn.AutoButtonColor = false
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-	local page = Instance.new("Frame", main)
-	page.Name = "Page_" .. tabName
-	page.Visible = (i == 1)
-	page.Position = UDim2.new(0, 140, 0, 0)
-	page.Size = UDim2.new(1, -140, 1, 0)
-	page.BackgroundTransparency = 1
-	pages[tabName] = page
+    local page = Instance.new("Frame", main)
+    page.Name = "Page_" .. tabName
+    page.Visible = (i == 1)
+    page.Position = UDim2.new(0, 140, 0, 0)
+    page.Size = UDim2.new(1, -140, 1, 0)
+    page.BackgroundTransparency = 1
+    pages[tabName] = page
 
-	btn.MouseButton1Click:Connect(function()
-		for _, p in pairs(pages) do p.Visible = false end
-		page.Visible = true
-	end)
+    btn.MouseButton1Click:Connect(function()
+        for _, p in pairs(pages) do
+            p.Visible = false
+        end
+        page.Visible = true
+    end)
 end
 
 -- Info Tab
@@ -135,6 +137,8 @@ infoLabel.BackgroundTransparency = 1
 infoLabel.Text = "Made by Isight Zyx and Imran\n\nHow to use:\n- Use Auto Farm button in Main Tab\n- You MUST have Auto Reload Ability in Slot 1"
 
 -- Main Tab Buttons
+
+-- Auto Farm Button
 local autoFarmBtn = Instance.new("TextButton", pages["⚙️ Main"])
 autoFarmBtn.Size = UDim2.new(0, 200, 0, 50)
 autoFarmBtn.Position = UDim2.new(0.5, -100, 0.3, 0)
@@ -148,37 +152,38 @@ Instance.new("UICorner", autoFarmBtn).CornerRadius = UDim.new(0, 6)
 local autoFarmThread = nil
 
 local function stopFarm()
-	if autoFarmThread then
-		autoFarmThread:Disconnect()
-		autoFarmThread = nil
-	end
-	_G.RunAutoFarm = false
+    if autoFarmThread then
+        autoFarmThread:Disconnect()
+        autoFarmThread = nil
+    end
+    _G.RunAutoFarm = false
 end
 
 local function startFarm()
-	_G.RunAutoFarm = true
-	local s = loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))
-	s()
+    _G.RunAutoFarm = true
+    local s = loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))
+    s()
 end
 
 autoFarmBtn.MouseButton1Click:Connect(function()
-	if _G.RunAutoFarm then
-		stopFarm()
-		autoFarmBtn.Text = "Auto Farm: OFF"
-		autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
-	else
-		startFarm()
-		autoFarmBtn.Text = "Auto Farm: ON"
-		autoFarmBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
-	end
+    if _G.RunAutoFarm then
+        stopFarm()
+        autoFarmBtn.Text = "Auto Farm: OFF"
+        autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
+    else
+        startFarm()
+        autoFarmBtn.Text = "Auto Farm: ON"
+        autoFarmBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
+    end
 end)
 
--- Auto Clicker
+-- Auto Clicker Button (clone of Auto Farm Btn)
 local autoClickerBtn = autoFarmBtn:Clone()
 autoClickerBtn.Text = "Auto Clicker"
 autoClickerBtn.Position = UDim2.new(0.5, -100, 0.55, 0)
 autoClickerBtn.Parent = pages["⚙️ Main"]
 
+-- Auto Clicker UI Popup
 local clickerUI = Instance.new("Frame", gui)
 clickerUI.Size = UDim2.new(0, 300, 0, 260)
 clickerUI.Position = UDim2.new(0.5, -150, 0.5, -130)
@@ -237,12 +242,14 @@ runBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
 runBtn.Font = Enum.Font.GothamBold
 runBtn.Parent = clickerUI
 
+-- Transparent overlay frame for tap-through during point setting
 local tapOverlay = Instance.new("Frame", gui)
 tapOverlay.Size = UDim2.new(1, 0, 1, 0)
 tapOverlay.BackgroundTransparency = 1
 tapOverlay.Visible = false
 tapOverlay.ZIndex = 1000
 tapOverlay.Active = true
+tapOverlay.Selectable = true
 
 local clickPoints = {}
 local indicators = {}
@@ -250,97 +257,113 @@ local clicking = false
 local setPointsConnection
 
 local function clearPoints()
-	for _, dot in pairs(indicators) do
-		dot:Destroy()
-	end
-	indicators = {}
-	clickPoints = {}
+    for _, dot in pairs(indicators) do
+        dot:Destroy()
+    end
+    indicators = {}
+    clickPoints = {}
 end
 
 local function createDotAtPos(pos)
-	local dot = Instance.new("Frame", gui)
-	dot.Size = UDim2.new(0, 12, 0, 12)
-	dot.Position = UDim2.new(0, pos.X - 6, 0, pos.Y - 6)
-	dot.BackgroundColor3 = Color3.new(1, 1, 1)
-	dot.BorderSizePixel = 0
-	dot.ZIndex = 9999
-	Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
-	return dot
+    local dot = Instance.new("Frame", gui)
+    dot.Size = UDim2.new(0, 12, 0, 12)
+    dot.Position = UDim2.new(0, pos.X - 6, 0, pos.Y - 6)
+    dot.BackgroundColor3 = Color3.new(1, 1, 1)
+    dot.BorderSizePixel = 0
+    dot.ZIndex = 9999
+    Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
+    return dot
 end
 
+-- Set Points Mode: Lasts 5 seconds after pressing Set Points button
 setBtn.MouseButton1Click:Connect(function()
-	if setPointsConnection then return end
+    if setPointsConnection then
+        return -- Already running, ignore
+    end
 
-	tapOverlay.Visible = true
+    tapOverlay.Visible = true
+    setBtn.Text = "Tap points anywhere... (5s left)"
 
-	setPointsConnection = tapOverlay.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-			local pos = input.Position
-			table.insert(clickPoints, pos)
-			local dot = createDotAtPos(pos)
-			table.insert(indicators, dot)
-		end
-	end)
+    local secondsLeft = 5
+    -- Countdown timer to auto-stop setting mode
+    local countdown = RunService.Heartbeat:Connect(function(dt)
+        secondsLeft = secondsLeft - dt
+        if secondsLeft <= 0 then
+            -- Stop setting points
+            tapOverlay.Visible = false
+            setBtn.Text = "Set Points (Tap Anywhere)"
+            if setPointsConnection then
+                setPointsConnection:Disconnect()
+                setPointsConnection = nil
+            end
+            countdown:Disconnect()
+        else
+            setBtn.Text = string.format("Tap points anywhere... (%.1fs left)", secondsLeft)
+        end
+    end)
 
-	task.delay(5, function()
-		if setPointsConnection then
-			setPointsConnection:Disconnect()
-			setPointsConnection = nil
-			tapOverlay.Visible = false
-		end
-	end)
+    setPointsConnection = tapOverlay.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local pos = input.Position
+            table.insert(clickPoints, pos)
+            local dot = createDotAtPos(pos)
+            table.insert(indicators, dot)
+        end
+    end)
 end)
 
 clearBtn.MouseButton1Click:Connect(function()
-	clearPoints()
+    clearPoints()
 end)
 
 runBtn.MouseButton1Click:Connect(function()
-	if clicking then
-		clicking = false
-		runBtn.Text = "Start Clicking"
-		return
-	end
+    if clicking then
+        clicking = false
+        runBtn.Text = "Start Clicking"
+        return
+    end
 
-	if #clickPoints == 0 then
-		runBtn.Text = "Set at least 1 point!"
-		task.delay(2, function()
-			if not clicking then
-				runBtn.Text = "Start Clicking"
-			end
-		end)
-		return
-	end
+    if #clickPoints == 0 then
+        runBtn.Text = "Set at least 1 point!"
+        task.delay(2, function()
+            if not clicking then
+                runBtn.Text = "Start Clicking"
+            end
+        end)
+        return
+    end
 
-	clicking = true
-	runBtn.Text = "Stop Clicking"
+    clicking = true
+    runBtn.Text = "Stop Clicking"
 
-	local delayTime = tonumber(delayBox.Text) or 1
+    local delayTime = tonumber(delayBox.Text) or 1
+    local UIS = game:GetService("UserInputService")
 
-	coroutine.wrap(function()
-		while clicking do
-			for _, pos in ipairs(clickPoints) do
-				if not clicking then break end
-				VirtualInputManager:SendTouchEvent(true, pos, 0)
-				task.wait(0.03)
-				VirtualInputManager:SendTouchEvent(false, pos, 0)
-				task.wait(delayTime)
-			end
-		end
-	end)()
+    coroutine.wrap(function()
+        while clicking do
+            for _, pos in ipairs(clickPoints) do
+                if not clicking then break end
+                UIS:SendMouseButtonEvent(pos.X, pos.Y, true, true)  -- Press
+                task.wait(0.03)
+                UIS:SendMouseButtonEvent(pos.X, pos.Y, false, true) -- Release
+                task.wait(delayTime)
+            end
+        end
+    end)()
 end)
 
 minimize.MouseButton1Click:Connect(function()
-	clickerUI.Visible = false
-	clicking = false
-	if setPointsConnection then
-		setPointsConnection:Disconnect()
-		setPointsConnection = nil
-	end
-	tapOverlay.Visible = false
-	runBtn.Text = "Start Clicking"
+    clickerUI.Visible = false
+    clicking = false
+    if setPointsConnection then
+        setPointsConnection:Disconnect()
+        setPointsConnection = nil
+    end
+    tapOverlay.Visible = false
+    runBtn.Text = "Start Clicking"
+    setBtn.Text = "Set Points (Tap Anywhere)"
 end)
 
 autoClickerBtn.MouseButton1Click:Connect(function()
-	clickerUI.Visible = not clickerUI.Visible
+    clickerUI.Visible = not clickerUI.Visible
 end)
