@@ -1,136 +1,166 @@
--- iSights Hypershot Utility with Apex Settings UI (identical style)
--- Made by Isight Zyx & Imran
 
--- Load cooldown bypass core
+-- iSights Hypershot Utility UI Clone (Aether Style)
+-- Made by Isight Zyx + Imran
+
+-- Load cooldown bypass on launch
 loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-No-Ability-Cooldown-Open-Sourced-47339"))()
 
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
-local UIS = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local RunService = game:GetService("RunService")
 
+-- GUI container
 local gui = Instance.new("ScreenGui")
-gui.Name = "iSightsApexUI"
+gui.Name = "iSightsHypershotUtility"
 gui.ResetOnSpawn = false
 gui.Parent = CoreGui
 
--- Main Apex window
-local win = Instance.new("Frame")
-win.Size = UDim2.new(0,600,0,420)
-win.Position = UDim2.new(0.5,-300,0.5,-210)
-win.BackgroundColor3 = Color3.fromRGB(28,28,48)
-win.BackgroundTransparency = 0.15
-win.BorderSizePixel = 0
-win.Active = true
-win.Draggable = true
-win.Parent = gui
-Instance.new("UICorner", win).CornerRadius = UDim.new(0,6)
-local stroke = Instance.new("UIStroke", win)
-stroke.Color = Color3.fromRGB(80,70,130)
+-- Main window
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 640, 0, 420)
+main.Position = UDim2.new(0.5, -320, 0.5, -210)
+main.BackgroundColor3 = Color3.fromRGB(25, 20, 40)
+main.BackgroundTransparency = 0.3
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
+main.Parent = gui
+
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 8)
+
+local stroke = Instance.new("UIStroke", main)
 stroke.Thickness = 1.5
+stroke.Color = Color3.fromRGB(80, 70, 120)
 
 -- Title bar
-local titleBar = Instance.new("Frame", win)
-titleBar.Size = UDim2.new(1,0,0,40)
-titleBar.BackgroundTransparency = 1
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, -80, 0, 40)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.Text = "iSights Hypershot Utility"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.BackgroundTransparency = 1
+title.TextXAlignment = Enum.TextXAlignment.Left
 
-local titleTxt = Instance.new("TextLabel", titleBar)
-titleTxt.Size = UDim2.new(1,-100,1,0)
-titleTxt.Position = UDim2.new(0,20,0,0)
-titleTxt.Text = "iSights Hypershot Utility"
-titleTxt.Font = Enum.Font.GothamBold
-titleTxt.TextSize = 22
-titleTxt.TextColor3 = Color3.fromRGB(235,235,255)
-titleTxt.BackgroundTransparency = 1
-titleTxt.TextXAlignment = Enum.TextXAlignment.Left
+-- Close button
+local closeBtn = Instance.new("TextButton", main)
+closeBtn.Size = UDim2.new(0, 40, 0, 40)
+closeBtn.Position = UDim2.new(1, -50, 0, 0)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 18
+closeBtn.TextColor3 = Color3.fromRGB(255, 90, 90)
+closeBtn.BackgroundTransparency = 1
 
--- Close & Minimize
-local btnClose = Instance.new("TextButton", titleBar)
-btnClose.Size = UDim2.new(0,40,0,40)
-btnClose.Position = UDim2.new(1,-50,0,0)
-btnClose.Text = "✕"
-btnClose.Font = Enum.Font.GothamBold
-btnClose.TextSize = 20
-btnClose.TextColor3 = Color3.fromRGB(255,90,90)
-btnClose.BackgroundTransparency = 1
-
-local btnMin = Instance.new("TextButton", titleBar)
-btnMin.Size = UDim2.new(0,40,0,40)
-btnMin.Position = UDim2.new(1,-100,0,0)
-btnMin.Text = "–"
-btnMin.Font = Enum.Font.GothamBold
-btnMin.TextSize = 20
-btnMin.TextColor3 = Color3.fromRGB(180,180,255)
-btnMin.BackgroundTransparency = 1
-
-local minimized = false
-btnMin.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    for _, c in ipairs(win:GetChildren()) do
-        if c ~= titleBar then c.Visible = not minimized end
-    end
-end)
-
-btnClose.MouseButton1Click:Connect(function()
-    if _G.AutoFarmConnection then _G.AutoFarmConnection:Disconnect() end
-    _G.RunAutoFarm = false
+closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
-end)
-
--- Apex Settings panel content
-local panel = Instance.new("Frame", win)
-panel.Size = UDim2.new(1,-40,1,-60)
-panel.Position = UDim2.new(0,20,0,50)
-panel.BackgroundColor3 = Color3.fromRGB(36,34,56)
-panel.BorderSizePixel = 0
-Instance.new("UICorner", panel).CornerRadius = UDim.new(0,4)
-
--- "Settings" header label
-local head = Instance.new("TextLabel", panel)
-head.Size = UDim2.new(1,0,0,30)
-head.Position = UDim2.new(0,0,0,10)
-head.Text = "Settings"
-head.Font = Enum.Font.GothamBold
-head.TextSize = 18
-head.TextColor3 = Color3.fromRGB(200,200,255)
-head.BackgroundTransparency = 1
-head.TextXAlignment = Enum.TextXAlignment.Left
-head.Padding = Instance.new("UIPadding", head)
-head.Padding.PaddingLeft = UDim.new(0,10)
-
--- Auto Farm toggle button
-local toggleBtn = Instance.new("TextButton", panel)
-toggleBtn.Size = UDim2.new(0,280,0,50)
-toggleBtn.Position = UDim2.new(0.5,-140,0,60)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(70,60,110)
-toggleBtn.Text = "Auto Farm: OFF"
-toggleBtn.Font = Enum.Font.GothamBold
-toggleBtn.TextSize = 18
-toggleBtn.TextColor3 = Color3.new(1,1,1)
-Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0,6)
-
-local function stopFarm()
     if _G.AutoFarmConnection then _G.AutoFarmConnection:Disconnect() end
     _G.RunAutoFarm = false
-    toggleBtn.Text = "Auto Farm: OFF"
-    toggleBtn.BackgroundColor3 = Color3.fromRGB(70,60,110)
-end
-
-local function startFarm()
-    _G.RunAutoFarm = true
-    toggleBtn.Text = "Auto Farm: ON"
-    toggleBtn.BackgroundColor3 = Color3.fromRGB(90,140,80)
-    local s = loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
-    _G.AutoFarmConnection = s
-end
-
-toggleBtn.MouseButton1Click:Connect(function()
-    if _G.RunAutoFarm then stopFarm() else startFarm() end
+    _G.AutoClick = false
 end)
 
--- Hover animations exactly like Apex style
-toggleBtn.MouseEnter:Connect(function()
-    TweenService:Create(toggleBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(80,70,130)}):Play()
-end)
-toggleBtn.MouseLeave:Connect(function()
-    TweenService:Create(toggleBtn, TweenInfo.new(0.15), {BackgroundColor3 = (_G.RunAutoFarm and Color3.fromRGB(90,140,80) or Color3.fromRGB(70,60,110))}):Play()
+-- Left nav bar
+local nav = Instance.new("Frame", main)
+nav.Size = UDim2.new(0, 140, 1, -40)
+nav.Position = UDim2.new(0, 0, 0, 40)
+nav.BackgroundColor3 = Color3.fromRGB(30, 26, 50)
+nav.BorderSizePixel = 0
+Instance.new("UICorner", nav).CornerRadius = UDim.new(0, 8)
+
+-- Pages container
+local pages = {}
+local tabList = {
+    {Name = "Info"},
+    {Name = "Main"},
+}
+
+for i, tab in ipairs(tabList) do
+    local btn = Instance.new("TextButton", nav)
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, (i - 1) * 42)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 35, 65)
+    btn.Text = tab.Name
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 16
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.BorderSizePixel = 0
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+
+    local page = Instance.new("Frame", main)
+    page.Name = "Page_" .. tab.Name
+    page.Size = UDim2.new(1, -150, 1, -50)
+    page.Position = UDim2.new(0, 150, 0, 50)
+    page.BackgroundTransparency = 1
+    page.Visible = (i == 1)
+    pages[tab.Name] = page
+
+    btn.MouseButton1Click:Connect(function()
+        for _, p in pairs(pages) do p.Visible = false end
+        page.Visible = true
+    end)
+end
+
+-- INFO PAGE
+local info = Instance.new("TextLabel", pages.Info)
+info.Size = UDim2.new(1, -20, 1, -20)
+info.Position = UDim2.new(0, 10, 0, 10)
+info.Text = [[
+Made by Isight Zyx and Imran
+
+Instructions:
+- Ability Slot 1 must be "Auto Reload"
+- AutoFarm is always ON by default
+- Use Auto Clicker button to simulate clicks
+]]
+info.Font = Enum.Font.Gotham
+info.TextSize = 16
+info.TextColor3 = Color3.new(1, 1, 1)
+info.TextWrapped = true
+info.TextXAlignment = Enum.TextXAlignment.Left
+info.TextYAlignment = Enum.TextYAlignment.Top
+info.BackgroundTransparency = 1
+
+-- MAIN PAGE
+local clickBtn = Instance.new("TextButton", pages.Main)
+clickBtn.Size = UDim2.new(0, 280, 0, 60)
+clickBtn.Position = UDim2.new(0.5, -140, 0.3, 0)
+clickBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
+clickBtn.Text = "Auto Clicker: OFF"
+clickBtn.Font = Enum.Font.GothamBold
+clickBtn.TextSize = 20
+clickBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", clickBtn).CornerRadius = UDim.new(0, 10)
+
+-- AutoFarm always on
+_G.RunAutoFarm = true
+loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
+
+-- Auto Clicker logic
+_G.AutoClick = false
+
+local function simulateTap(x, y)
+    VirtualInputManager:SendTouchEvent(Enum.UserInputType.Touch, Vector2.new(x, y), "Begin", game)
+    VirtualInputManager:SendTouchEvent(Enum.UserInputType.Touch, Vector2.new(x, y), "End", game)
+end
+
+local function startClicking()
+    spawn(function()
+        while _G.AutoClick do
+            -- Start button and adjacent ability button (bottom-center region)
+            simulateTap(340, 630)  -- Estimated left button position
+            simulateTap(460, 630)  -- Estimated center button position
+            wait(3)
+        end
+    end)
+end
+
+clickBtn.MouseButton1Click:Connect(function()
+    _G.AutoClick = not _G.AutoClick
+    clickBtn.Text = "Auto Clicker: " .. (_G.AutoClick and "ON" or "OFF")
+    clickBtn.BackgroundColor3 = _G.AutoClick and Color3.fromRGB(80, 120, 80) or Color3.fromRGB(60, 50, 100)
+    if _G.AutoClick then
+        startClicking()
+    end
 end)
