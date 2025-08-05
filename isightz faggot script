@@ -164,3 +164,37 @@ clickBtn.MouseButton1Click:Connect(function()
         startClicking()
     end
 end)
+
+
+
+-- Auto Clicker Logic (Clicks two specific screen spots every 3 seconds)
+local UserInputService = game:GetService("UserInputService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local RunService = game:GetService("RunService")
+
+local phoneScale = workspace.CurrentCamera.ViewportSize
+local iPhone14ScaleX, iPhone14ScaleY = 1170, 2532 -- iPhone 14 screen resolution (points)
+local scaleX = phoneScale.X / iPhone14ScaleX
+local scaleY = phoneScale.Y / iPhone14ScaleY
+
+local clickPoints = {
+    Vector2.new(260, 2090), -- Spot 1
+    Vector2.new(460, 2090)  -- Spot 2
+}
+
+-- Convert and click function
+local function clickAt(position)
+    local scaledPos = Vector2.new(position.X * scaleX, position.Y * scaleY)
+    VirtualInputManager:SendMouseButtonEvent(scaledPos.X, scaledPos.Y, 0, true, game, 0)
+    VirtualInputManager:SendMouseButtonEvent(scaledPos.X, scaledPos.Y, 0, false, game, 0)
+end
+
+-- Start auto clicking loop
+task.spawn(function()
+    while true do
+        for _, pos in ipairs(clickPoints) do
+            clickAt(pos)
+        end
+        task.wait(3)
+    end
+end)
