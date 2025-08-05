@@ -1,18 +1,19 @@
--- iSights Hypershot Utility (Exact Clone of Aether UI)
--- Made by isight zyx and imran
--- Auto-load cooldown bypass
+-- iSights Hypershot Utility (Perfect Clone)
+-- Made by Isight Zyx and Imran
+-- Auto-load cooldown bypass script
 
 loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-No-Ability-Cooldown-Open-Sourced-47339"))()
 
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 local gui = Instance.new("ScreenGui", CoreGui)
 gui.Name = "iSightsHypershotUtility"
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Draggable main frame
+-- Main Frame (Draggable)
 local main = Instance.new("Frame")
 main.Size = UDim2.new(0, 520, 0, 320)
 main.Position = UDim2.new(0.5, -260, 0.5, -160)
@@ -23,59 +24,106 @@ main.Active = true
 main.Draggable = true
 main.Parent = gui
 
-local uicorner = Instance.new("UICorner", main)
-uicorner.CornerRadius = UDim.new(0, 8)
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
 
 local gradient = Instance.new("UIGradient", main)
 gradient.Color = ColorSequence.new {
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 50, 90)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 30, 70))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(65, 55, 120)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 30, 80))
 }
 gradient.Rotation = 90
 
 local stroke = Instance.new("UIStroke", main)
-stroke.Color = Color3.fromRGB(80, 70, 120)
+stroke.Color = Color3.fromRGB(90, 80, 150)
 stroke.Thickness = 2
 
--- Tab menu
+-- Close (X) and Minimize (-) Buttons
+local closeBtn = Instance.new("TextButton", main)
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -35, 0, 5)
+closeBtn.Text = "X"
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 16
+closeBtn.TextColor3 = Color3.fromRGB(255, 90, 90)
+closeBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 70)
+Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(1, 0)
+
+local minBtn = Instance.new("TextButton", main)
+minBtn.Size = UDim2.new(0, 30, 0, 30)
+minBtn.Position = UDim2.new(0.5, -15, 0, -15)
+minBtn.Text = "-"
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 16
+minBtn.TextColor3 = Color3.new(1, 1, 1)
+minBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
+Instance.new("UICorner", minBtn).CornerRadius = UDim.new(1, 0)
+
+local miniIcon = Instance.new("TextButton", gui)
+miniIcon.Size = UDim2.new(0, 50, 0, 50)
+miniIcon.Position = UDim2.new(0.1, 0, 0.8, 0)
+miniIcon.Text = "📱"
+miniIcon.Visible = false
+miniIcon.Font = Enum.Font.GothamBold
+miniIcon.TextSize = 24
+miniIcon.TextColor3 = Color3.new(1, 1, 1)
+miniIcon.BackgroundColor3 = Color3.fromRGB(80, 60, 130)
+miniIcon.Active = true
+miniIcon.Draggable = true
+Instance.new("UICorner", miniIcon).CornerRadius = UDim.new(1, 0)
+
+closeBtn.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+minBtn.MouseButton1Click:Connect(function()
+    main.Visible = false
+    miniIcon.Visible = true
+end)
+
+miniIcon.MouseButton1Click:Connect(function()
+    main.Visible = true
+    miniIcon.Visible = false
+end)
+
+-- Tab Layout
 local tabFrame = Instance.new("Frame", main)
 tabFrame.Size = UDim2.new(0, 140, 1, 0)
 tabFrame.BackgroundColor3 = Color3.fromRGB(28, 26, 46)
 tabFrame.BorderSizePixel = 0
-Instance.new("UICorner", tabFrame).CornerRadius = UDim.new(0, 6)
+Instance.new("UICorner", tabFrame).CornerRadius = UDim.new(0, 8)
 
--- Tab Buttons
-local tabList = {"main", "info"}
+local tabList = {"📄 Info", "⚙️ Main"}
 local pages = {}
+
 for i, tabName in ipairs(tabList) do
-	local btn = Instance.new("TextButton", tabFrame)
-	btn.Size = UDim2.new(1, 0, 0, 40)
-	btn.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
-	btn.Text = "+ " .. tabName
-	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 14
-	btn.BackgroundColor3 = Color3.fromRGB(32, 30, 50)
-	btn.BorderSizePixel = 0
-	btn.AutoButtonColor = false
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    local btn = Instance.new("TextButton", tabFrame)
+    btn.Size = UDim2.new(1, 0, 0, 40)
+    btn.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
+    btn.Text = tabName
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 14
+    btn.BackgroundColor3 = Color3.fromRGB(32, 30, 50)
+    btn.BorderSizePixel = 0
+    btn.AutoButtonColor = false
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
 
-	local page = Instance.new("Frame", main)
-	page.Name = "Page_" .. tabName
-	page.Visible = (i == 1)
-	page.Position = UDim2.new(0, 140, 0, 0)
-	page.Size = UDim2.new(1, -140, 1, 0)
-	page.BackgroundTransparency = 1
-	pages[tabName] = page
+    local page = Instance.new("Frame", main)
+    page.Name = "Page_" .. tabName
+    page.Visible = (i == 1)
+    page.Position = UDim2.new(0, 140, 0, 0)
+    page.Size = UDim2.new(1, -140, 1, 0)
+    page.BackgroundTransparency = 1
+    pages[tabName] = page
 
-	btn.MouseButton1Click:Connect(function()
-		for _, p in pairs(pages) do p.Visible = false end
-		page.Visible = true
-	end)
+    btn.MouseButton1Click:Connect(function()
+        for _, p in pairs(pages) do p.Visible = false end
+        page.Visible = true
+    end)
 end
 
--- INFO TAB
-local infoLabel = Instance.new("TextLabel", pages["info"])
+-- INFO TAB CONTENT
+local infoLabel = Instance.new("TextLabel", pages["📄 Info"])
 infoLabel.Size = UDim2.new(1, -20, 1, -20)
 infoLabel.Position = UDim2.new(0, 10, 0, 10)
 infoLabel.TextWrapped = true
@@ -85,10 +133,10 @@ infoLabel.Font = Enum.Font.Gotham
 infoLabel.TextSize = 15
 infoLabel.TextColor3 = Color3.new(1,1,1)
 infoLabel.BackgroundTransparency = 1
-infoLabel.Text = "Made by isight zyx and imran\n\nHow to use:\n- Use Auto Farm button (Main tab)\n- You must have Auto Reload ability in first slot"
+infoLabel.Text = "Made by Isight Zyx and Imran\n\nHow to use:\n- Use Auto Farm button in Main Tab\n- You MUST have Auto Reload Ability in Slot 1"
 
--- MAIN TAB
-local autoFarmBtn = Instance.new("TextButton", pages["main"])
+-- MAIN TAB CONTENT
+local autoFarmBtn = Instance.new("TextButton", pages["⚙️ Main"])
 autoFarmBtn.Size = UDim2.new(0, 200, 0, 50)
 autoFarmBtn.Position = UDim2.new(0.5, -100, 0.4, 0)
 autoFarmBtn.Text = "Auto Farm: OFF"
@@ -98,59 +146,30 @@ autoFarmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
 Instance.new("UICorner", autoFarmBtn).CornerRadius = UDim.new(0, 6)
 
-local autoFarmRunning = false
-_G.RunAutoFarm = false
+local autoFarmThread = nil
 
 local function stopFarm()
-	_G.RunAutoFarm = false
+    if autoFarmThread then
+        autoFarmThread:Disconnect()
+        autoFarmThread = nil
+    end
+    _G.RunAutoFarm = false
 end
 
 local function startFarm()
-	_G.RunAutoFarm = true
-	coroutine.wrap(function()
-		loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
-	end)()
+    _G.RunAutoFarm = true
+    local s = loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))
+    s()
 end
 
 autoFarmBtn.MouseButton1Click:Connect(function()
-	autoFarmRunning = not autoFarmRunning
-	if autoFarmRunning then
-		autoFarmBtn.Text = "Auto Farm: ON"
-		autoFarmBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
-		startFarm()
-	else
-		autoFarmBtn.Text = "Auto Farm: OFF"
-		autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
-		stopFarm()
-	end
-end)
-
--- Minimize Button
-local minBtn = Instance.new("TextButton", main)
-minBtn.Size = UDim2.new(0, 30, 0, 30)
-minBtn.Position = UDim2.new(0.5, -15, 0, -15)
-minBtn.Text = "i"
-minBtn.Font = Enum.Font.GothamBlack
-minBtn.TextSize = 16
-minBtn.TextColor3 = Color3.new(1, 1, 1)
-minBtn.BackgroundColor3 = Color3.fromRGB(40, 30, 60)
-Instance.new("UICorner", minBtn).CornerRadius = UDim.new(1, 0)
-local miniIcon = Instance.new("TextButton", gui)
-miniIcon.Size = UDim2.new(0, 40, 0, 40)
-miniIcon.Position = UDim2.new(0, 15, 1, -60)
-miniIcon.Text = "i"
-miniIcon.Visible = false
-miniIcon.Font = Enum.Font.GothamBlack
-miniIcon.TextSize = 22
-miniIcon.TextColor3 = Color3.new(1, 1, 1)
-miniIcon.BackgroundColor3 = Color3.fromRGB(80, 60, 130)
-Instance.new("UICorner", miniIcon).CornerRadius = UDim.new(1, 0)
-
-minBtn.MouseButton1Click:Connect(function()
-	main.Visible = false
-	miniIcon.Visible = true
-end)
-miniIcon.MouseButton1Click:Connect(function()
-	main.Visible = true
-	miniIcon.Visible = false
+    if _G.RunAutoFarm then
+        stopFarm()
+        autoFarmBtn.Text = "Auto Farm: OFF"
+        autoFarmBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
+    else
+        startFarm()
+        autoFarmBtn.Text = "Auto Farm: ON"
+        autoFarmBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
+    end
 end)
