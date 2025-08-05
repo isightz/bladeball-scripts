@@ -111,7 +111,7 @@ autoBtn.MouseButton1Click:Connect(function()
 		autoBtn.BackgroundColor3 = Color3.fromRGB(80, 120, 80)
 		autoScript = loadstring(game:HttpGet("https://rawscripts.net/raw/NEW!-Hypershot-(Gunfight)-Bring-All-Players-And-Bots-Open-Source-47412"))()
 	else
-		autoBtn.Text = "Auto Farm: cant turn off nigger"
+		autoBtn.Text = "Auto Farm: OFF"
 		autoBtn.BackgroundColor3 = Color3.fromRGB(60, 50, 100)
 		autoScript = nil
 	end
