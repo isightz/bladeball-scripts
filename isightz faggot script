@@ -90,6 +90,3 @@ MainTab:CreateButton("Open Auto Clicker", function()
 		clickPoints = {}
 	end)
 end)
-
--- UI Styling, Minimize button, dragable minimized UI
--- You can use your existing UI code or apply UI gradient/styling here.
